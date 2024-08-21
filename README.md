@@ -25,12 +25,12 @@ At the end of this course, we expect that people taking the course can apply the
 | 3   | 09/16/2024 | Tidy Data, Workflow Intro, ggplot2  |
 | 4   | 09/23/2024 | Iteration: map functions, for loops. Functions |
 | 5   | 09/30/2024 | Data acquisition (grid and ground data)  |
-| 6   | 10/07/2024 | Linear model I |
-| 7   | 10/14/2024 | Linear models II |
-| 8   | 10/21/2024 | Mixed Models I  |
-| 9   | 10/28/2024 | Mixed Models II  |
-| 10  | 11/04/2024 |  Working on Project |
+| 6   | 10/07/2024 | Experimental Design |
+| 7   | 10/14/2024 | Linear model I |
+| 8   | 10/21/2024 | Linear models II |
+| 9   | 11/01/2024 | Mixed Models I  |
+| 10  | 11/04/2024 |  Mixed Models II |
 | 11  | 11/15/2024 |  Working on Project |
 | 12  | 11/18/2024 |  Working on Project |
-| 13  | 11/25/2024 |  Working on Project |
-| 14  | 12/02/2024 |  Project Presentation |
+| 13  | 11/25/2024 |  Thanks giving break |
+| 14  | 12/05/2024 |  Project Presentation |
