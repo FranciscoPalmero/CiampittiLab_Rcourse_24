@@ -1,0 +1,777 @@
+---
+title: "Day 1: Introduction to R"
+author: "Luiz Felipe Almeida & Francisco Palmero"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Welcome to your first class on R! 
+
+![](images/logo_ciampitti_White.png){fig-align="left" width="157"}
+
+# 01. Introduction to R
+
+Today, you'll learn what R is, how to begin programming, and some fundamental concepts that will be useful throughout this journey!
+
+## What is R?
+
+-   **R** is a programming language and an integrated development environment (IDE).
+-   The R language was created in the early 1990s at the University of Auckland by Ross Ihaka and Robert Gentleman.
+-   It is free, open-source software supported by a large community.
+-   R is an **interpreted language**, sometimes called a **scripting language**. You can write your R code and immediately run it without compiling it into a separate program, allowing immediate feedback, flexibility, and ease of use.
+
+## RStudio Interface
+
+Before we dive into coding, let's familiarize ourselves with the RStudio interface:
+
+-   **Console**: Where you type and execute your R commands (same as no-IDE coding).
+-   **Editor**: For coding, commenting, editing, and saving scripts.
+-   **Workspace**: Keeps track of your objects, functions, and data sets.
+-   **Files, Plots, Packages, Help**: Manage your files, visualize data (in base R), manage packages, and access documentation/help pages.
+
+# 02. Assigning Objects in R
+
+In R, an **object** is used to store information that can be referenced and manipulated throughout your program. You can assign values to object using the assignment operator `<-` (or `=`).
+
+## a) Assigning a numeric value to a object
+
+```{r}
+temperature <- 25
+
+(temperature <- 25)
+print(temperature)
+```
+
+## b) Assigning a character string to a object
+
+```{r}
+crop <- "soybean"
+print(crop)
+```
+
+## c) Assigning a logical value to a object
+
+```{r}
+irrigated <- TRUE
+print(irrigated)
+```
+
+## d) Storing intermediate results in objects
+
+When performing a series of calculations, it's often useful to store intermediate results in objects. This allows you to reuse these results later without recomputing them.
+
+```{r}
+# Storing the exponential of 2
+temp_value <- exp(2)
+print(temp_value)
+
+# Using the stored value
+sqrt(temp_value)*pi
+```
+
+# 03. Basic Operations in R
+
+## Arithmetic Operations
+
+R can be used as a powerful calculator. You can perform basic arithmetic operations directly:
+
+```{r}
+# Sum
+2 + 2
+
+# Subtract
+5 - 3
+
+# Multiply
+2 * 2
+
+# Divide
+10 / 5
+
+# Convert Fahrenheit to Celsius
+fahrenheit <- 95
+celsius <- (fahrenheit - 32) * 5 / 9
+print(celsius)
+```
+
+### Order of Operations and Parentheses
+
+Just like in traditional math, R follows the order of operations . You can use parentheses to control the order in which operations are executed:
+
+```{r}
+# Without parentheses
+2 * 100 / 4   # Multiplication is done first, then division
+
+# With parentheses
+2 * 100 / (4 + 2)  # Division is done after addition
+```
+
+### Creating Sequences with the Colon Operator
+
+The colon operator (:) returns every integer between two integers, creating a sequence of numbers.
+
+```{r}
+# One line of results
+1:5
+
+# More than one line of results
+1:100
+```
+
+### Handling Incomplete Commands and Errors
+
+Sometimes, you may not complete a command properly, leading to errors. R provides immediate feedback, helping you debug.
+
+```{r error=TRUE}
+# Incomplete command example
+5 -
+```
+
+### Errors in R
+
+If you use incorrect syntax or commands, R will return an error message.
+
+```{r error=TRUE}
+# Intentional errors
+5 x 5
+4 plus 4
+
+# Correcting the errors
+5 * 5
+4 + 4
+```
+
+### What Does the Semicolon (;) Do in R?
+
+You can use the semicolon to execute multiple commands on the same line.
+
+```{r}
+# Run one command per line
+5 * 5
+4 * 7
+
+# Run more than one command on a single line
+5 * 5; 4 * 7
+```
+
+# 04. Operators in R
+
+Operators in R are used to perform operations on objects and values. There are several types of operators in R:
+
+## a) Assignment Operators
+
+These are used to assign values to objects:
+
+```{r}
+# Assignment with `<-` 
+x <- 5
+
+# Assignment with `=`
+y = 10
+
+# Right assignment
+20 -> z
+```
+
+## b) Arithmetic Operators
+
+These are used for performing basic mathematical operations:
+
+```{r}
+# Addition
+5 + 3
+
+# Subtraction
+5 - 3
+
+# Multiplication
+5 * 3
+
+# Division
+5 / 3  
+
+# Exponentiation
+5^3    
+```
+
+## c) Boolean Operators
+
+Boolean operators return logical results based on the comparison:
+
+```{r}
+# Equal to
+5 == 3  
+
+# Not equal to
+5 != 3  
+
+# Greater than
+5 > 3   
+
+# Less than
+5 < 3   
+
+# Greater than or equal to
+5 >= 3  
+
+# Less than or equal to
+5 <= 3
+```
+
+## d) Logical Operators
+
+These are used to combine logical statements:
+
+```{r}
+# Logical AND
+TRUE & FALSE  
+
+# Logical OR
+TRUE | FALSE  
+
+# Logical NOT
+!TRUE 
+```
+
+# 05. Data Types
+
+Understanding data types is essential for effective programming in R. Different data types allow you to store and manipulate various kinds of data.
+
+a.  Numeric: Used to store numbers (integers or decimals).
+
+b.  Integer: Specifically used for whole numbers.
+
+c.  Logical: Represents boolean values (TRUE or FALSE).
+
+d.  Character: Used for storing text (strings).
+
+e.  Factor: Represents categorical data.
+
+f.  Complex: Used for complex numbers (with real and imaginary parts).
+
+g.  Special numbers: Inf, NA, NaN
+
+## a) Numeric
+
+Numeric data types are used to store numbers, including both integers and decimals (floating-point numbers). In R, numeric values are typically stored as "double" precision.
+
+```{r}
+# Numeric examples
+n1 <- 10        
+n2 <- 5.5
+
+# Check the type
+typeof(n1)      
+typeof(n2)      
+
+# Basic arithmetic operations
+n1 + n2
+n1 * n2
+n1 / n2
+```
+
+## b) Integer
+
+The integer data type is used to store whole numbers. To explicitly define an integer in R, you need to append an L suffix to the number.
+
+```{r}
+# Integer examples
+int1 <- 20L      
+int2 <- -5L        
+
+# Check the type
+typeof(int1)       
+typeof(int2)      
+
+# Integer arithmetic
+int1 + int2
+int1 * int2
+```
+
+## c) Logical
+
+Logical data types represent boolean values: TRUE or FALSE. These are often used in conditional statements and logical operations.
+
+```{r}
+# Logical examples
+is_raining <- TRUE
+is_sunny <- FALSE
+
+# Check the type
+typeof(is_raining)
+
+# Logical operations
+is_raining & is_sunny  # AND 
+is_raining | is_sunny   # OR 
+!is_raining            # NOT 
+```
+
+## d) Character
+
+Character data types are used for storing text (strings). Characters in R are enclosed in either single (') or double (") quotes.
+
+```{r}
+# Character examples
+greeting <- "Hello, World!"
+name <- 'Alice'
+
+# Check the type
+typeof(greeting)  
+
+# String concatenation
+full_greeting <- paste(greeting, name)
+print(full_greeting)
+
+# Length
+name_length <- nchar(name)
+print(name_length)
+```
+
+## e) Factor
+
+Factors are used to represent categorical data. They store both the values and the corresponding category levels. Factors can be ordered or unordered.
+
+```{r}
+# Factor examples
+colors <- factor(c("purple", "orange", "blue", "black", "red"))
+
+# Display the factor and its levels
+print(colors)
+levels(colors)
+
+# Check the type and class
+typeof(colors)   
+class(colors)    
+
+# Changing factor levels
+colors <- factor(colors, levels = c("purple", "orange", "red"))
+print(colors)
+```
+
+## f) Complex
+
+Complex data types represent complex numbers, which include a real and an imaginary part. In R, complex numbers are represented with an i for the imaginary part.
+
+```{r}
+# Complex number example
+z <- 3 + 4i
+
+print(z)
+```
+
+## g) Special Numbers
+
+R also includes special numeric values that represent different conditions and scenarios:
+
+### Inf
+
+Inf represents positive infinity, while -Inf represents negative infinity. These are often used in calculations where a result exceeds the largest finite number representable.
+
+```{r}
+pos_inf <- Inf
+neg_inf <- -Inf
+
+# Display values
+print(pos_inf)
+print(neg_inf)
+
+# Check the type
+typeof(pos_inf)
+typeof(neg_inf)
+
+# Arithmetic with Inf
+pos_inf + 1
+pos_inf * 2
+pos_inf > 1000
+```
+
+### NA
+
+NA represents a missing value in R. It stands for "Not Available" and is used to handle incomplete data.
+
+```{r}
+# NA examples
+missing_value <- NA
+
+# Check the type
+typeof(missing_value)  # "logical"
+
+# NA in operations
+missing_value + 5
+missing_value == 5
+```
+
+### NaN
+
+NaN stands for "Not a Number" and represents an undefined or unrepresentable numerical result, such as 0/0.
+
+```{r}
+# NaN examples
+nan_value <- NaN
+
+# Check the type
+typeof(nan_value)  # "double"
+
+# NaN in operations
+nan_value * 2
+is.nan(nan_value)
+```
+
+# 06. Data Structures
+
+In R, data structures are containers used to store and organize data. Different data structures are designed for different types of operations, and choosing the right one depends on the task at hand.
+
+a.  Vector: A one-dimensional collection of data of the same type.
+
+b.  Matrix: A two-dimensional collection of data of the same type.
+
+c.  List: A collection of elements that can be of different types.
+
+d.  Data Frame: A two-dimensional, table-like structure where each column can have different types.
+
+e.  Array: A multi-dimensional generalization of matrices.
+
+## a) Vector
+
+A vector is a one-dimensional collection of data, where all elements must be of the same type (numeric, character, logical, etc.). Vectors are the most basic data structure in R.
+
+```{r}
+# Vector examples
+num_vector <- c(1, 2, 3, 4, 5)         # Numeric vector
+char_vector <- c("apple", "banana", "cherry")  # Character vector
+log_vector <- c(TRUE, FALSE, TRUE)      # Logical vector
+
+# Shortcuts
+rep(1, 10, times = 2)
+seq(1, 10, by = 2)
+
+# Access an element
+num_vector[3]
+char_vector[c(1:3)]
+```
+
+## b) Matrix
+
+A matrix is a two-dimensional data structure where all elements must be of the same type. Matrices are particularly useful for mathematical operations.
+
+```{r}
+# Matrix example
+mat <- matrix(1:9, nrow = 3, ncol = 3)
+
+# Print the matrix
+print(mat)
+
+# Basic matrix operations
+t(mat)
+mat + 10  
+```
+
+## c) List
+
+A list is a flexible data structure that can store elements of different types, including vectors, matrices, data frames, or even other lists.
+
+```{r}
+# List example
+a_list <- list(brand = "John Deere", hp = 250, drivetrain = c('2WD', '4WD', 'full-time-4WD'))
+
+# Access elements in the list
+print(a_list$brand)   
+print(a_list$hp)
+
+# Modify elements in the list
+a_list$hp <- 350
+print(a_list$hp)
+```
+
+## d) Data frame
+
+A data frame is a two-dimensional table-like data structure where each column can store different types of data. Data frames are commonly used for storing datasets.
+
+```{r}
+# Data frame example
+df_example <- data.frame(
+  crop = c("Soybean", "Corn", "Sorghum"),
+  yield = c(4.5, 9.0, 8.0),
+  season = c(2021, 2021, 2021))
+
+# Display the data frame
+print(df_example)
+
+# Accessing columns
+df_example$crop  
+
+# Basic operations
+mean(df_example$yield)  
+```
+
+## e) Array
+
+An array is a multi-dimensional data structure. It generalizes matrices to more than two dimensions and can store data of the same type.
+
+```{r}
+# Array example
+array_example <- array(1:10, dim = c(2, 3, 2))
+
+# Print the array
+print(array_example)
+
+# Access elements in an array
+print(array_example[1, 2, 1])  
+```
+
+# 07. Working with Objects
+
+Objects in R allow you to save data into your computer's memory. An object is just a name you can choose to call up stored data.
+
+## a) R is case-sensitive
+
+R is case-sensitive, meaning that greet and Greet are considered different objects. This can be a common source of errors.
+
+```{r error=TRUE}
+# Create an object with character data
+greet <- c("Hello", "Olá", "Hola")
+
+# Trying to access a non-existing object
+Greet
+```
+
+## b) Overwriting objects
+
+R allows you to overwrite the contents of an existing object.
+
+```{r}
+# Original object
+greet
+greet <- "Hello"
+greet
+
+# Listing objects in the workspace
+ls()
+```
+
+# 08. Functions
+
+A function is just an R object that performs statements in a predefined order. The main structure of a function is:
+
+``` {error="TRUE"}
+function_name(argument1 = value1, argument2 = value2, ...)
+```
+
+### Creating and Rolling a Dice
+
+Functions like sample() can be used to simulate random events, like rolling dice.
+
+```{r}
+# Creating a simple dice
+dice <- 1:6
+
+# Rolling the dice twice
+set.seed(5)  # For reproducibility
+sample(x = dice, size = 2, replace = TRUE)
+```
+
+# 9. Packages
+
+Packages in R are collections of functions, documentation, and data sets that extend the capabilities of base R. They provide additional functionality and tools that make data analysis and manipulation more efficient.
+
+## a) Installing packages
+
+To use additional packages in R, you need to install them. The `install.packages` function is used for this purpose. Below are examples of how to install some commonly used packages:
+
+## b) Installing `tidyverse`, `readxl`, and `easypackages`
+
+-   **`tidyverse`**: A collection of R packages designed for data science, including `ggplot2`, `dplyr`, `tidyr`, and others that facilitate data manipulation, visualization, and analysis.
+-   **`readxl`**: Provides functions to read Excel files (both `.xls` and `.xlsx` formats) into R.
+-   **`easypackages`**: A package that simplifies the installation and management of multiple R packages.
+
+```{r}
+# Install the tidyverse package
+install.packages("tidyverse", dependencies = TRUE, repos = "https://cloud.r-project.org")
+
+# Install the readxl package for reading Excel files
+install.packages("readxl", dependencies = TRUE, repos = "https://cloud.r-project.org")
+
+# Install the easypackages package for managing multiple package installations
+install.packages("easypackages", repos = "https://cloud.r-project.org")
+```
+
+## c) Loading packages
+
+Once you've installed the packages, you need to load them into your R session before you can use them. This is done using the library function or the easypackages package.
+
+```{r}
+# Load the tidyverse package
+library(tidyverse)
+
+# Load the readxl package
+library(readxl)
+
+# Alternatively, you can use easypackages to load multiple packages at once
+easypackages::libraries("tidyverse", "readxl")
+```
+
+The **`::`** operator allows access to a specific function from a particular package without loading the entire package. It is also useful to avoid
+
+## d) Handling function conflicts
+
+When working with multiple packages in R, sometimes different packages have functions with the same name.
+
+```{r error=TRUE}
+library(dplyr) 
+library(MASS)  
+
+data <- data.frame(A = 1:5, B = 6:10)  
+select(data, A)
+dplyr::select(data, A)
+```
+
+# 10. Tidy data world
+
+## a) Reading the data
+
+```{r}
+# Read untidy data (xlsx)
+read_excel(path = "../data/weather_untidy.xlsx")
+
+# Read a specific sheet
+read_excel(path = "../data/weather_untidy.xlsx", sheet = "OTT15")
+
+# Read a specific sheet and skip rows
+read_excel(path = "../data/weather_untidy.xlsx", sheet = "OTT15", skip = 4)
+
+# Read tidy data (csv)
+df <- read.csv("../data/weather_tidy.csv")
+```
+
+The tidyverse package provides a set of functions to help with data manipulation. Here are some key functions:
+
+### b) The pipe operator
+
+The pipe operator **`%>%`** allows you to chain multiple operations together. This can make your code more readable and concise.
+
+```{r}
+# Chain multiple operations to process the data
+processed_data <- df %>%
+  select(location, temperature, date) %>%          # Select columns
+  filter(temperature > 30, date >= "2024-01-01") %>% # Filter rows
+  mutate(temperature_celsius = (temperature - 32) * 5 / 9) %>% # Add new column
+  arrange(desc(date))                              # Arrange by date
+
+# Display the first few rows of the processed data
+head(processed_data)
+```
+
+### c) Selecting columns
+
+```{r}
+# Select specific columns from the data
+df %>% select(location, date, AirTemp_max)
+
+# Select columns whose names start with 'Air'
+df %>% select(starts_with("Air")) 
+
+# Select columns whose names end with a specific string.
+df %>% select(ends_with("max")) 
+
+# Select columns whose names contain a specific substring.
+df %>% select(contains("Temp")) 
+
+# Select columns whose names match a regular expression.
+df %>% select(matches("Temp|Date")) 
+
+# Select columns that start with 'Air' and contain 'Temp'
+df %>% select(starts_with("Air"), contains("Temp"))
+```
+
+### d) Filtering rows
+
+```{r}
+# Filter rows where AirTemp_min is greater than 10 and date is on or after 2024-01-01
+df %>% filter(AirTemp_min > 10 & date >= "2024-01-01") 
+# Filter rows where AirTemp_min is between 10 and 30
+df %>% filter(AirTemp_min > 10 & AirTemp_min < 30) 
+# Filter rows where AirTemp_min is between 10 and 30
+df %>% filter(between(AirTemp_min, 10, 30)) 
+# Filter rows where location is either 'Ottawa' or 'Toronto'
+df %>% filter(location %in% c("Ottawa"))
+# Filter rows where AirTemp_max is NA
+df %>% filter(is.na(AirTemp_max)) 
+# Filter rows where location matches the regular expression for starting with 'Ott'
+df %>% filter(grepl("^Ott", location)) 
+```
+
+### e) Creating or modifying columns
+
+```{r}
+# Create a new column for MAX - MIN temp
+df %>% mutate(temp_difference = AirTemp_max - AirTemp_min)
+
+# Create a new column indicating if the T > 32°F
+df %>% mutate(is_above_freezing = if_else(temperature > 32, TRUE, FALSE)) 
+
+# Categorize temperature into 'Low', 'Medium', or 'High'
+df %>% mutate(temp_category = case_when(
+  AirTemp_max <= 10 ~ "Low",
+  AirTemp_max > 10 ~ "High",
+  T ~ NA))
+
+# Create a new column that is the average of AirTemp_max and AirTemp_min
+df %>% mutate(avg_maxTemp = mean(AirTemp_max, na.rm = T))
+```
+
+### f) Arranging data
+
+```{r}
+# Arrange data by 'date' in descending order
+df %>% arrange(desc(date))
+```
+
+### g) Renaming columns
+
+```{r}
+# Rename a single column
+df %>% rename(Max_Temperature = AirTemp_max)
+
+# Rename multiple columns
+df %>% rename(Min_Temperature = AirTemp_min, Max_Temperature = AirTemp_max)
+
+# Convert all names to lowercase
+df %>% rename_with(tolower)
+
+# Use rename_with to add a suffix '_temp' to all columns that contain 'AirTemp'
+df %>% rename_with(~ paste0(., "_C"), contains("AirTemp"))
+
+# Use rename_with to apply a function to all column names, such as converting them to uppercase
+df %>% rename_with(toupper)
+
+# Rename by using a named vector for old and new column names
+df %>% rename(`Min Temperature` = AirTemp_min, `Max Temperature` = AirTemp_max)
+```
+
+### h) Summarize information
+
+```{r}
+df %>% summarise(mean_precip_mm = mean(precip_mm, na.rm = TRUE))
+```
+
+# 11. Code Chunks
+
+R Markdown allows you to combine R code and text to create dynamic documents.
+
+**To insert a new R chunk, you can use the following keyboard shortcut:**
+
+**`Ctrl`** + **`Alt`** + **`I`**
+
+```{r}
+
+```
+
+  
+
+
+
+
+
+
