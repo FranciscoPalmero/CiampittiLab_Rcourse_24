@@ -1,0 +1,326 @@
+---
+title: "Tidyverse"
+author: "Luiz Felipe & Francisco"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# 1) Short review
+
+-   Creating a chunk of code
+-   Loading packages (tidyverse and readxl)
+-   Creating an object
+-   Commenting in .Rmd: in-chunk or out-of-chunk
+-   Running a chunk of code
+-   View an object in R studio
+-   Pipe operator
+
+# 2) Load packages
+
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
+# 3) Import data
+
+```{r}
+# Load weather data
+df_weather <- read.csv("../Data/nfix_weather.csv") %>% select(-X)
+
+# Load biomass data
+df_biomass <- read.csv("../Data/nfix_biomass.csv") %>% select(-X) 
+
+# Load yield data
+df_yield <- read.csv("../Data/nfix_yield.csv") %>% select(-X)
+
+str(df_weather)
+str(df_biomass)
+str(df_yield)
+```
+
+# 4) Tidyverse
+
+-   What's tidy data?
+
+### SELECT
+
+Helper functions:
+- starts_with()
+- ends_with()
+- contains()
+- matches()
+- num_range()
+- grepl()
+- between()
+- across()
+
+```{r}
+# Select specific columns from the data
+df_weather 
+
+# Select columns whose names start with a given string
+df_weather
+
+# Select columns whose names end with a specific string.
+df_weather
+
+# Select columns whose names contain a specific substring.
+df_weather
+```
+
+### ARRANGE
+
+```{r}
+# Reorder the data frame rows according to the lowest-to-highest yield
+df_yield
+
+# Reorder the data frame rows according to the highest-to-lowest yield
+df_yield
+```
+
+### RENAME
+
+```{r}
+# Change column name
+df_yield
+
+# To upper or lower case (rename_with(tolower/touuper))
+df_yield
+df_yield
+```
+
+### FILTER
+
+```{r}
+# Filter rows
+df_weather
+
+# Filter rows where PP_B is less than or equal to 200
+df_weather
+
+# Filter rows where Yield_mgha is between 5 and 7 tons/ha (between() or using &)
+df_yield
+df_yield
+
+# Filter KS1 sites (`%in%`)
+df_weather
+
+# Filter rows where Yield_mgha is not NA (!is.na())
+df_yield
+
+# Filter rows where Site contains "KS" (grepl)
+df_weather
+```
+
+### MUTATE
+
+```{r}
+# Create a new column with total PP
+df_weather
+
+# Create a new column with total PP after a given column
+df_weather
+
+# Change type of data from character to factor (`mutate(across(c()))`)
+df_biomass
+```
+
+### ROUND
+
+```{r}
+# Round yield values
+df_yield
+```
+
+### SUMMARISE
+
+```{r}
+# Create a summary data frame with mean yield (na.rm=T)
+df_yield
+```
+
+### GROUP_BY
+
+```{r}
+# Group by Treatment and summarize mean yield
+df_yield
+
+# Group by Site and Treatment and summarize mean yield
+df_yield
+```
+
+### SEPARATE
+
+```{r}
+# Separate Site into Location and Year
+df_yield
+```
+
+### UNITE
+
+```{r}
+# Create ID column (remove or not previous)
+df_biomass
+```
+
+### DISTINCT
+
+```{r}
+# Get distinct Sites (distinct())
+df_yield
+
+# Get distinct combinations of Site and Treatment
+df_yield
+```
+
+### COUNT
+
+```{r}
+# Count number of rows within each site (count())
+df_yield
+```
+
+
+### CASE_WHEN
+
+```{r}
+# Create a new column that categorizes yields into "low", "medium", and "high"
+# Yield_mgha < 3.5 ~ "low"; Yield_mgha >= 3.5 & Yield_mgha < 5 ~ "medium"; Yield_mgha >= 5 ~ "high"
+df_yield
+
+# Change only "Check" to "Control" (T~)
+df_biomass
+
+# Use base R to change the values of cells
+#df_yield[1, 2] <- "Cheeck"
+#df_yield[8, 2] <- "check"
+
+# Solve the problem using %in%
+# df_yield %>% 
+#   mutate(Treatment = case_when(Treatment %in% c("Cheeck", "check") ~ "Check",
+#                                TRUE ~ Treatment))
+```
+
+### PIPE
+
+```{r}
+# Chain multiple operations to process the data
+df_yield %>%  
+  filter(Treatment == "Check") %>% 
+  group_by(Site) %>%
+  mutate(mean_Yield_mgha = median(Yield_mgha)) %>% 
+  summarise(mean_Yield_mgha) %>% 
+  unique() %>% 
+  separate(Site, into = c("Location", "Season"), sep = "_") %>% 
+  rename(meanY = mean_Yield_mgha)
+```
+
+### STR_REPLACE
+
+```{r}
+# Replace a string in the Site column
+df_yield %>% 
+  mutate(across(Site, ~ str_replace(., pattern = "_", replacement = ":")))
+
+# Let's create a non-desired pattern. Let the error be an underscore in the Check treatment.
+# Solve the error so that you have the true name back 
+df_yield %>% 
+  mutate(Treatment = case_when(Treatment == "Check" ~ "C_heck",
+                                TRUE ~ Treatment)) %>% 
+  mutate(across(Treatment,
+                ~ str_replace(., pattern = "_",
+                              replacement = "")))
+```
+
+### IS.NA and NA_IF
+
+```{r}
+# Example Dataset: df_yield
+df_yield_NA <- tibble(
+  Site = c("KS1", "KS3", "KS4"),
+  Treatment = c("Check", "N", "S"),
+  Yield = c(50, 70, 65))
+
+# 1. Use `na_if()` to replace the value "Check" in the Treatment column with NA
+# df_yield_naif <- df_yield %>%
+#   mutate(Treatment = na_if(Treatment, "Check"))
+# 
+# print(df_yield_naif)
+
+# 2. Use `is.na()` to create a new column that flags where Treatment is NA
+# df_yield_filtered <- df_yield_naif %>%
+#   mutate(Flag_NA = is.na(Treatment))
+
+# 3. Use `is.na()` to filter out rows where the Treatment is NA
+# df_yield_filtered <- df_yield_naif %>%
+#   filter(!is.na(Treatment))
+```
+
+### JOIN FUNCTIONS
+
+```{r}
+# Sample data frames
+df_X <- tibble(
+  Site_Season = c("IA1_2021", "IA2_2021", "IA3_2022"),
+  Yield = c(150, 200, 180))
+
+df_Y <- tibble(
+  Site_Season = c("IA1_2021", "IA2_2021", "IA4_2022"),
+  Biomass = c(50, 60, 55))
+
+# INNER-JOIN: Includes common rows for x and y
+df_X %>% 
+  inner_join(df_Y, by = "Site_Season")
+
+# LEFT_JOIN: Includes all rows from X and matched rows from Y
+df_X %>% 
+  left_join(df_Y, by = "Site_Season")
+
+# RIGHT_JOIN: Includes all rows from Y and matched rows from X
+df_X %>% 
+  right_join(df_Y, by = "Site_Season")
+
+# FULL_JOIN: Includes all rows from both X and Y
+df_X %>% 
+  full_join(df_Y, by = "Site_Season")
+```
+
+### PIVOT_WIDER
+
+```{r}
+# Pivot wider: Convert long data back to wide format
+df_yield %>% 
+  pivot_wider(names_from = Treatment, values_from = Yield_mgha)
+```
+
+### PIVOT LONGER
+
+```{r}
+# Pivot longer: Convert wide data to long format
+df_weather %>% 
+  dplyr::select(Site, season, PP_A, PP_B, PP_C, PP_D, PP_E) %>% 
+  pivot_longer(cols = starts_with("PP"), names_to = "Period", values_to = "Precipitation") 
+```
+
+# 5) Final comments
+
+-   Put all library() calls at the top of the script.
+-   Organize your files into 'data', 'script/notebook'/'markdown', and 'output'.
+-   Comment your code.
+-   Object names: Don’t start with numbers & Keep them as short as understandable.
+-   Each %>% should be followed by a new line.
+-   Avoid long lines (start a new line after a comma).
+-   Always use na.rm = TRUE in summarise() functions to handle NA values.
+-   Use %>% for chaining functions to keep code clean and readable.
+-   When joining datasets, ensure that the keys have consistent names and formats.
+
+
+
+
+
+
+

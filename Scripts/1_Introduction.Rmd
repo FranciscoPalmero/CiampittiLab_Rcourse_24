@@ -7,9 +7,9 @@ editor_options:
   chunk_output_type: inline
 ---
 
-# Welcome to your first class on R! 
+# Welcome to your first class on R!
 
-![](images/logo_ciampitti_White.png){fig-align="left" width="157"}
+![](images/logo_ciampitti_White.png){fig-align="left" width="213"}
 
 # 01. Introduction to R
 
@@ -767,11 +767,3 @@ R Markdown allows you to combine R code and text to create dynamic documents.
 ```{r}
 
 ```
-
-  
-
-
-
-
-
-
