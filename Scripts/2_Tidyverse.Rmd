@@ -1,6 +1,6 @@
 ---
 title: "Tidyverse"
-author: "Luiz Felipe & Francisco"
+author: "Luiz Felipe & Francisco Palmero"
 date: "`r Sys.Date()`"
 output: html_document
 editor_options: 
@@ -60,149 +60,176 @@ Helper functions:
 
 ```{r}
 # Select specific columns from the data
-df_weather 
+df_weather %>% 
+  select(season)
 
 # Select columns whose names start with a given string
-df_weather
+df_weather %>% 
+  select(starts_with(c("Tmean","PP")))
 
 # Select columns whose names end with a specific string.
-df_weather
-
-# Select columns whose names contain a specific substring.
-df_weather
+df_weather %>% 
+  select(ends_with("A"))
 ```
 
 ### ARRANGE
 
 ```{r}
 # Reorder the data frame rows according to the lowest-to-highest yield
-df_yield
+df_yield %>% arrange(Yield_mgha)
 
 # Reorder the data frame rows according to the highest-to-lowest yield
-df_yield
+df_yield %>% 
+  arrange(desc(Yield_mgha))
 ```
 
 ### RENAME
 
 ```{r}
 # Change column name
-df_yield
+df_yield %>% 
+  rename(yield = Yield_mgha)
 
 # To upper or lower case (rename_with(tolower/touuper))
-df_yield
-df_yield
+df_yield %>% 
+  rename_with(tolower)
+
+df_yield %>% 
+  rename_with(toupper)
 ```
 
 ### FILTER
 
 ```{r}
 # Filter rows
-df_weather
+df_weather %>% filter(PP_A <= 20)
 
-# Filter rows where PP_B is less than or equal to 200
-df_weather
+# Filter rows
+df_weather %>% filter(Site == "IN1")
 
 # Filter rows where Yield_mgha is between 5 and 7 tons/ha (between() or using &)
-df_yield
-df_yield
+df_yield %>% filter(between(Yield_mgha, 5, 7))
+df_yield %>% filter(Yield_mgha > 5 & Yield_mgha < 7)
 
 # Filter KS1 sites (`%in%`)
-df_weather
+df_weather %>% filter(Site %in% "KS1")
+
+# Filter KS1 and KS2 sites (`%in%`)
+df_weather %>% filter(Site %in% c("KS1","KS2"))
 
 # Filter rows where Yield_mgha is not NA (!is.na())
-df_yield
+df_yield %>% filter(is.na(Yield_mgha))
 
 # Filter rows where Site contains "KS" (grepl)
-df_weather
+df_weather %>% filter(!grepl("KS", Site))
 ```
 
 ### MUTATE
 
 ```{r}
 # Create a new column with total PP
-df_weather
+df_weather %>% mutate(PPtotal = PP_A + PP_B + PP_C)
 
 # Create a new column with total PP after a given column
-df_weather
+df_weather %>% mutate(PPtotal = PP_A + PP_B + PP_C, .after = "season")
 
 # Change type of data from character to factor (`mutate(across(c()))`)
-df_biomass
+df_biomass %>% mutate(across(c(Site, Stage, Block, Treatment), as.factor))
 ```
 
 ### ROUND
 
 ```{r}
 # Round yield values
-df_yield
+df_yield %>% mutate(across(Yield_mgha,round,digits=2))
 ```
 
 ### SUMMARISE
 
 ```{r}
 # Create a summary data frame with mean yield (na.rm=T)
-df_yield
+df_yield %>% summarise(mean = mean(Yield_mgha))
 ```
 
 ### GROUP_BY
 
 ```{r}
 # Group by Treatment and summarize mean yield
-df_yield
+df_yield %>% 
+  group_by(Treatment) %>% 
+  summarise(mean = mean(Yield_mgha, na.rm = TRUE))
 
 # Group by Site and Treatment and summarize mean yield
-df_yield
+df_yield %>% 
+  group_by(Treatment, Site) %>% 
+  summarise(mean = mean(Yield_mgha, na.rm = TRUE))
 ```
 
 ### SEPARATE
 
 ```{r}
 # Separate Site into Location and Year
-df_yield
+df_yield %>% separate(Site, c("Location","Season"), remove = F, sep = 3)
+df_yield %>% separate(Site, c("Location","Season"), remove = F, sep = "_")
 ```
 
 ### UNITE
 
 ```{r}
 # Create ID column (remove or not previous)
-df_biomass
+df_biomass %>% unite(ID, Site, Stage, Block, Treatment, sep = "_")
 ```
 
 ### DISTINCT
 
 ```{r}
 # Get distinct Sites (distinct())
-df_yield
+df_yield %>% distinct(Treatment)
 
 # Get distinct combinations of Site and Treatment
-df_yield
+df_yield %>% distinct(Site, Treatment)
+
+df_yield %>% 
+  group_by(Site, Treatment, Block) %>% 
+  unique() %>% 
+  summarise()
 ```
 
 ### COUNT
 
 ```{r}
 # Count number of rows within each site (count())
-df_yield
+df_yield %>% 
+  count(Site)
 ```
-
 
 ### CASE_WHEN
 
 ```{r}
 # Create a new column that categorizes yields into "low", "medium", and "high"
 # Yield_mgha < 3.5 ~ "low"; Yield_mgha >= 3.5 & Yield_mgha < 5 ~ "medium"; Yield_mgha >= 5 ~ "high"
-df_yield
+df_yield %>% 
+  mutate(yield_class = case_when(Yield_mgha < 3.5 ~ "low",
+                                 Yield_mgha >= 3.5 & Yield_mgha < 5 ~ "medium",
+                                 Yield_mgha >= 5 ~ "high"))
 
 # Change only "Check" to "Control" (T~)
-df_biomass
+df_biomass %>% 
+  mutate(Treatment = case_when(Treatment == "Check" ~ "Control",
+                               Treatment == "Unfertilized" ~ "Corn",
+                               T ~ Treatment))
 
 # Use base R to change the values of cells
-#df_yield[1, 2] <- "Cheeck"
-#df_yield[8, 2] <- "check"
+df_yield[1, 2] <- "Cheeck"
+df_yield[8, 2] <- "check"
+
+df_yield %>% group_by(Treatment) %>% unique() %>% summarise()
 
 # Solve the problem using %in%
-# df_yield %>% 
-#   mutate(Treatment = case_when(Treatment %in% c("Cheeck", "check") ~ "Check",
-#                                TRUE ~ Treatment))
+df_yield <- df_yield %>%
+  mutate(Treatment = case_when(
+    Treatment %in% c("Cheeck", "check") ~ "Check", 
+    TRUE ~ Treatment))
 ```
 
 ### PIPE
@@ -224,7 +251,7 @@ df_yield %>%
 ```{r}
 # Replace a string in the Site column
 df_yield %>% 
-  mutate(across(Site, ~ str_replace(., pattern = "_", replacement = ":")))
+  mutate(across(Site, ~str_replace(., pattern = "_", replacement = ":")))
 
 # Let's create a non-desired pattern. Let the error be an underscore in the Check treatment.
 # Solve the error so that you have the true name back 
@@ -246,18 +273,18 @@ df_yield_NA <- tibble(
   Yield = c(50, 70, 65))
 
 # 1. Use `na_if()` to replace the value "Check" in the Treatment column with NA
-# df_yield_naif <- df_yield %>%
-#   mutate(Treatment = na_if(Treatment, "Check"))
-# 
-# print(df_yield_naif)
+df_yield_naif <- df_yield %>%
+  mutate(Treatment = na_if(Treatment, "Check"))
+ 
+print(df_yield_naif)
 
 # 2. Use `is.na()` to create a new column that flags where Treatment is NA
-# df_yield_filtered <- df_yield_naif %>%
-#   mutate(Flag_NA = is.na(Treatment))
+df_yield_filtered <- df_yield_naif %>%
+   mutate(Flag_NA = is.na(Treatment))
 
 # 3. Use `is.na()` to filter out rows where the Treatment is NA
-# df_yield_filtered <- df_yield_naif %>%
-#   filter(!is.na(Treatment))
+df_yield_filtered <- df_yield_naif %>%
+   filter(!is.na(Treatment))
 ```
 
 ### JOIN FUNCTIONS
@@ -270,7 +297,7 @@ df_X <- tibble(
 
 df_Y <- tibble(
   Site_Season = c("IA1_2021", "IA2_2021", "IA4_2022"),
-  Biomass = c(50, 60, 55))
+  Yield = c(50, 60, 55))
 
 # INNER-JOIN: Includes common rows for x and y
 df_X %>% 
@@ -289,6 +316,8 @@ df_X %>%
   full_join(df_Y, by = "Site_Season")
 ```
 
+### BIND ROWS AND COLUMNS
+
 ### PIVOT_WIDER
 
 ```{r}
@@ -302,7 +331,7 @@ df_yield %>%
 ```{r}
 # Pivot longer: Convert wide data to long format
 df_weather %>% 
-  dplyr::select(Site, season, PP_A, PP_B, PP_C, PP_D, PP_E) %>% 
+  dplyr::select(Site, season, PP_A, PP_B, PP_C, PP_D) %>% 
   pivot_longer(cols = starts_with("PP"), names_to = "Period", values_to = "Precipitation") 
 ```
 
@@ -317,10 +346,3 @@ df_weather %>%
 -   Always use na.rm = TRUE in summarise() functions to handle NA values.
 -   Use %>% for chaining functions to keep code clean and readable.
 -   When joining datasets, ensure that the keys have consistent names and formats.
-
-
-
-
-
-
-
