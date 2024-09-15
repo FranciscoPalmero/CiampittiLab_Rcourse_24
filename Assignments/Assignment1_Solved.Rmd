@@ -1,0 +1,204 @@
+---
+title: "Assignment 1"
+author: ""
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: "cosmo" # This theme has a slight purple tone. You can customize it further with CSS.
+    highlight: tango
+    css: styles.css  # Optional: You can add custom styles in an external CSS file
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    latex_engine: xelatex
+    includes:
+      in_header: preamble.tex  # Optional: Add a LaTeX file to further control appearance
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+library(readxl)
+```
+
+## Guidelines
+
+-   Use **R Markdown** to complete this assignment.\
+-   Provide all your **code** to ensure that your work is **reproducible**.\
+-   Include explanations or comments when necessary.
+
+------------------------------------------------------------------------
+
+# 1. Data Structures
+
+### 1.1 Create a vector
+
+Create a new chunk below this text. Then, create a vector called v1 with three elements, all of which are characters (enclosed in single ' ' or double " quotes). Save it and print the values.
+
+```{r, include=FALSE}
+# Create a character vector `v1`
+v1 <- c("soybean", "maize", "alfalfa")
+print(v1)
+```
+
+### 1.2 Convert vector to a factor
+
+Create a vector v2 from v1, but convert it to a factor. Save and print the values. Change the order of the levels to any random order and print the values again.
+
+```{r, include=FALSE}
+v2 <- factor(v1)
+print(v2)
+
+# Change the order of the levels
+v2 <- factor(v1, levels = c("soybean", "alfalfa", "maize"))
+print(v2)
+```
+
+### 1.3 Create a list
+
+Create a list l1 that contains v1, v2, and an additional object of class data.frame containing the following information:
+
+Irrigation |  Value
+-----------|-------
+yes        |  200 
+yes        |  200
+no         |  0
+
+```{r, include=FALSE}
+# Create a data frame to include in the list
+df_irr <- data.frame(irrigation = c("yes", "yes", "no"), value = c(200, 200, 0))
+
+# Create a list `l1`
+l1 <- list(v1, v2, df_irr)
+print(l1)
+```
+
+------------------------------------------------------------------------
+
+# 2. Reading and Saving Files, Accessing Elements
+
+### 2.1 Read the tillage data
+
+Read the file doy_weather.xlsx from the "data" folder into a new data frame df.
+
+```{r, include=FALSE}
+df <- read_xlsx("../../CiampittiLab_Rcourse_24/Data/doy_weather.xlsx")
+
+print(df)
+```
+
+### 2.2 Check column types
+
+Check the data types for all columns in the data frame. Some columns might be read as characters even though they represent numeric values. Convert any necessary columns to numeric.
+
+```{r, include=FALSE}
+# Check column types
+print(str(df))
+
+# Convert character columns to numeric
+df <- df %>%
+  mutate(across(c(TMIN, TMAX, RAIN), as.numeric))
+
+print(str(df))
+```
+
+### 2.3 Replace missing values
+
+Some columns contain missing values coded as -99. Replace all instances of -99 with NA in numeric columns only. Save the result in a new data frame called df_clean.
+
+```{r, include=FALSE}
+# Convert "-99" to NA in numeric columns using str_replace_all
+df_clean <- df %>%
+  mutate(across(where(is.numeric), ~str_replace_all(as.character(.), "-99", "NA") %>% as.numeric()))
+```
+
+### 2.3 Calculate mean Tmax
+
+Calculate the mean of the TMAX column, ignoring missing values (NA). Save the result as mean_Tmax.
+
+```{r, include=FALSE}
+# Calculate mean Tmax
+df_clean %>%
+  summarise(mean_Tmax = mean(TMAX, na.rm = TRUE))
+```
+
+### 2.4 Compare temperatures
+
+Create a new column Tmean, which is the average of TMAX and TMIN. Save the updated data frame as df_temp.
+
+```{r, include=FALSE}
+df_clean %>%
+  mutate(Tmean = (TMAX + TMIN) / 2)
+```
+
+### 2.5 Day with the highest precipitation
+
+Find the day with the highest precipitation (RAIN). Save the result as max_rain_day.
+
+```{r, include=FALSE}
+# Find the day with maximum precipitation
+df_clean %>%
+  filter(RAIN == max(RAIN, na.rm = TRUE)) %>%
+  select(DOY, RAIN)
+```
+
+### 2.6 Subsetting data
+
+Create a new data frame df_subset that includes only rows where precipitation (RAIN) is greater than 0.
+
+```{r, include=FALSE}
+# Subset data where RAIN > 0
+df_clean %>%
+  filter(RAIN > 0)
+```
+
+### 2.7 Sorting data
+
+Sort the data frame df_clean by TMAX in descending order. Save the result as df_sorted.
+
+```{r, include=FALSE}
+# Sort by Tmax in descending order
+df_sorted <- df_clean %>%
+  arrange(desc(TMAX))
+```
+
+### 2.8 Summary statistics
+
+Calculate summary statistics (mean, median, standard deviation) for the TMAX column. Save the result as df_summary.
+
+```{r, include=FALSE}
+# Summary statistics for Tmax
+df_summary <- df_clean %>%
+  summarise(
+    mean_Tmax = mean(TMAX, na.rm = TRUE),
+    median_Tmax = median(TMAX, na.rm = TRUE),
+    sd_Tmax = sd(TMAX, na.rm = TRUE))
+
+df_summary
+```
+
+### 2.9 Conditional Mutations with case_when
+
+Create a new column Temperature_Category in df_clean, which classifies Tmean as:
+
+"Low" if TMAX < 10  
+"Moderate" if 10 <= TMAX <= 25  
+"High" if TMAX > 25  
+
+Save the updated data frame as `df_class` selecting DOY, TMAX, and Category columns.
+
+```{r, include=FALSE}
+# Add Temperature_Category using case_when
+df_class <- df_clean %>%
+  mutate(Category = case_when(
+    TMAX < 10 ~ "Low",
+    TMAX >= 10 & TMAX <= 25 ~ "Moderate",
+    TMAX > 25 ~ "High",
+    TRUE ~ NA_character_  # Catch any cases that don't match the conditions
+  )) %>% 
+  select(DOY, TMAX, Category)
+```
+
