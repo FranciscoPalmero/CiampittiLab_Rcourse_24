@@ -1,0 +1,286 @@
+---
+title: "3_Workflow"
+author: "Luiz Felipe & Francisco"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+**Today's Overview:**
+
+-   Assignment questions?
+
+-   Basic functions review (Blooket)
+
+-   ggplot()
+
+-   Workflow
+
+# 1. Load packages
+
+```{r warning=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+```
+
+# 2. Import data
+
+## a) Read the data: this a simulated database recreating a typical corn yield response to plant density.
+
+```{r}
+df <- read_excel("../Data/dens_yield.xlsx")
+```
+
+## b) Classifying data
+
+```{r}
+# Create a new column for plant density by categorizing the density into low, medium (&), and high according to the .33 and .66 quantiles. 
+
+```
+
+# 3. ggplot()
+
+## a) Canvas
+
+```{r}
+# Create an empty canvas
+
+```
+
+## b) Add layers
+
+-   The layers in ggplot2 are in the form of 'geom\_...()' and 'stat\_...()'
+
+-   The visual properties of the plot are specified inside the function aes(). The aes() function can be written inside the ggplot() function (apply to all geoms and stats) or inside the geoms or stats (apply to that particular geom or stat).
+
+```{r}
+# Create am scatter plot showing corn yield vs plant density
+
+```
+
+-   Adjust a quadratic model using geom_smooth
+
+```{r}
+
+```
+
+## c) Adjust your aesthetics
+
+```{r}
+# Create an scatter plot showing corn yield vs plant density and incorporate the plant density as a categorical variable.
+
+# Color by class
+  
+
+# Shape by class (increase size)
+
+
+# Color and shape by class
+
+```
+
+## d) Manage the scales
+
+-   'scale\_...()'
+-   manage the scale of the axis
+-   manage the scale to fill and colors
+
+```{r}
+
+# Adjust the limits of the limits of the axis (limits)
+
+
+# Change the colors (do not let ggplot chooses the colors for you (c())
+
+```
+
+## e) Plots arragement
+
+facets: 'facet\_': split your plot according to a categorical variable
+
+```{r}
+# Split the scatter plot according to the density categories
+
+```
+
+## f) Plot themes
+
+```{r}
+# Default themes + customizables 
+
+```
+
+## g) Saving plots
+
+```{r}
+# Save in png and jpeg (dimensions, resolution, ...)
+
+```
+
+# ---------------------------------------------------
+
+# Workflow
+
+## Steps in a Tidyverse Workflow
+
+> 1.  Load necessary packages.
+> 2.  Import and clean the data.
+> 3.  Explore the data to understand its structure.
+> 4.  Transform and manipulate the data.
+> 5.  Visualize information.
+> 6.  Join datasets when needed.
+> 7.  Perform data analyses and summarization.
+> 8.  Communicate your results.
+
+# 1) Packages
+
+```{r warning=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+```
+
+# 2) Data preparation
+
+## a) Loading crop information
+
+```{r warning=FALSE}
+crop_info <- readxl::read_excel("../Data/N_initiative/Yield_Plant_Measurements.xlsx",
+                   sheet = 2) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(VTPwet:R4N,
+                ~as.numeric(.)))
+```
+
+## b) Loading site information
+
+```{r}
+site_info <- readxl::read_excel("../Data/N_initiative/1.Site_Characterization.xlsx",
+                   sheet = 2) %>% 
+  rename(`Trial#` = `Trail#`) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(Clay:WC,
+                ~as.numeric(.)))
+```
+
+## c) Loading irrigation information
+
+```{r warning=FALSE}
+irrig_info <- readxl::read_excel("../Data/N_initiative/11.Irrigation.xlsx",
+                   sheet = 2) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(HOBO_flag = as.numeric(HOBO_flag))
+```
+
+# 3) Exploratory data analysis
+
+## a) Inspect Data Types
+
+```{r}
+glimpse(crop_info)
+glimpse(site_info)
+```
+
+## b) Summary statistics
+
+```{r}
+summary(crop_info$GYdry)
+summary(site_info)
+
+crop_info %>% 
+  ggplot()+
+  geom_density(aes(x = GYdry, fill = State), alpha = 0.2)
+```
+
+## c) Visualizing variables: Boxplot of Grain Yield
+
+```{r fig.height=4, fig.width=12}
+unique(crop_info$Site_Prod)
+
+crop_info %>% 
+  mutate(Site_Prod = factor(Site_Prod, 
+                            levels = c("Low", "High"))) %>%
+  
+  ggplot(aes(x = State, y = GYdry/1000, alpha = Site_Prod)) +
+  geom_boxplot(aes(fill = Site_Prod), show.legend = T) +
+  labs(y = expression(Grain~Yield~(tn~ha^{-1})),
+       fill = "Site Productivity") +
+  scale_fill_manual(values = c(Low = "darkorange", High = "purple")) +
+  scale_alpha_manual(values = c("Low" = 0.5, "High" = 0.5), guide = "none") + 
+  facet_wrap(~Year)
+```
+
+## d) Visualizing multiple variables
+
+```{r fig.height=4, fig.width=14}
+unique(crop_info$Site_Prod)
+
+crop_info %>% 
+  select(State, Yield_Bu, TotdryM, Plant_N) %>%
+  pivot_longer(cols = c(Yield_Bu, TotdryM), names_to = "variable", values_to = "value") %>%
+  ggplot(aes(x = Plant_N, y = value))+
+  geom_point(aes(color = State))+
+  geom_smooth(se = F, color = "black")+
+  labs(y = expression(Yield~(bu~ac^{-1})),
+       fill = "Site productivity")+
+  facet_grid(variable~State, scales = "free")+
+  theme_bw()+
+  theme(text = element_text(size = 16))
+```
+
+```{r}
+irrig_info %>%
+  unite("location", c("Site", "State"), sep = ", ", remove = F) %>%
+  ggplot(aes(location, Irrg_mm))+
+  geom_col(aes(fill = factor(Year), group = factor(Year)), 
+           position = position_dodge())+
+  labs(fill = "Year",
+       y = "Irrigation (mm)")+
+  theme_bw()+
+  scale_fill_manual(values = c("#4E6766", "#5AB1BB", "#A5C882"))+
+  theme(axis.title.x = element_blank())
+```
+
+# 4) Data cleaning
+
+## a) Checking for Missing Data
+
+Before performing more complex analyses, it's essential to identify and handle missing data.
+
+```{r}
+crop_info %>% 
+  summarise(across(everything(), ~sum(is.na(.))))
+```
+
+## b) Handling Missing Data
+
+```{r}
+crop_info %>%
+  drop_na(GYdry)
+```
+
+# 5. Data Transformation
+
+## a) Merge datasets and create new variables
+
+```{r}
+site_crop_info <- crop_info %>%
+  left_join(site_info, by = "Trial#")
+```
+
+```{r}
+crop_info %>%
+  right_join(irrig_info) %>% # Keep all rows of irrig_info
+  group_by(Year, State, Site, `Trial#`, Plant_N_SI, Side_N_SI, GYdry) %>% 
+  summarise(Irrg_tot_mm = sum(Irrg_mm),
+            Napplied = Plant_N_SI + Side_N_SI) %>%
+  ungroup() %>% 
+  unite("Location", c("Site", "State"), sep = ", ", remove = F) %>%
+  ggplot(aes(Napplied, GYdry/1000))+
+  geom_point(aes(color = Irrg_tot_mm))+
+  labs(color = "Total irrigation (mm)",
+       y = expression(Yield~(tn~ha^{-1})),
+       x = "Irrigation (mm)")+
+  theme_bw()
+```
