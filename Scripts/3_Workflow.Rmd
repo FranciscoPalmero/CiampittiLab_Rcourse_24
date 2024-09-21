@@ -34,7 +34,9 @@ df <- read_excel("../Data/dens_yield.xlsx")
 
 ```{r}
 # Create a new column for plant density by categorizing the density into low, medium (&), and high according to the .33 and .66 quantiles. 
-
+df <- df %>% mutate(class = case_when(pl_m2 < quantile(pl_m2, .33) ~ "Low",
+                                pl_m2 > quantile(pl_m2, .66) ~ "High",
+                                T ~ "Medium"))
 ```
 
 # 3. ggplot()
@@ -43,7 +45,7 @@ df <- read_excel("../Data/dens_yield.xlsx")
 
 ```{r}
 # Create an empty canvas
-
+ggplot()
 ```
 
 ## b) Add layers
@@ -54,13 +56,44 @@ df <- read_excel("../Data/dens_yield.xlsx")
 
 ```{r}
 # Create am scatter plot showing corn yield vs plant density
+ 
+ggplot()+
+  geom_point(data = df, aes(x = pl_m2, y = yield_t.ha))
 
+df %>% 
+  ggplot(aes(x = pl_m2, y = yield_t.ha))+
+  geom_point()
 ```
 
 -   Adjust a quadratic model using geom_smooth
 
 ```{r}
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha))+
+  geom_smooth(aes(x=pl_m2, y = yield_t.ha), method = "lm", formula = y ~ x)
 
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha))+
+  geom_smooth(aes(x=pl_m2, y = yield_t.ha), method = "lm", formula = y ~ poly(x,2))
+
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha))+
+  geom_smooth(aes(x=pl_m2, y = yield_t.ha))
+
+df %>% 
+  ggplot(aes(x=pl_m2, y=yield_t.ha))+
+  geom_point()+
+  geom_smooth()
+
+## The order matters
+df %>% 
+  ggplot(aes(x=pl_m2, y=yield_t.ha))+
+  geom_smooth()+
+  geom_point()+
+  geom_vline(xintercept = 5)
 ```
 
 ## c) Adjust your aesthetics
@@ -69,13 +102,20 @@ df <- read_excel("../Data/dens_yield.xlsx")
 # Create an scatter plot showing corn yield vs plant density and incorporate the plant density as a categorical variable.
 
 # Color by class
-  
+df %>% 
+  mutate(class = factor(class, levels = c("Low","Medium","High"))) %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha, colour=class), show.legend = T)
 
 # Shape by class (increase size)
-
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha, shape=class), size = 3, color = "purple")
 
 # Color and shape by class
-
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha, colour=class, shape=class), size = 3)
 ```
 
 ## d) Manage the scales
@@ -87,9 +127,22 @@ df <- read_excel("../Data/dens_yield.xlsx")
 ```{r}
 
 # Adjust the limits of the limits of the axis (limits)
-
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha, colour=class, shape=class), size = 3)+
+  scale_x_continuous(limits = c(0, 12))+
+  scale_y_continuous(limits = c(0, 12))
 
 # Change the colors (do not let ggplot chooses the colors for you (c())
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha, fill=class, shape=class), size = 3, shape = 22)+
+  scale_fill_manual(values = c("Low" = "navy", "Medium" = "darkorange", "High"= "tomato"))
+
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha, colour=class, shape=class), size = 3, shape = 23)+
+  scale_colour_manual(values = c("Low" = "navy", "Medium" = "darkorange", "High"= "tomato"))
 
 ```
 
@@ -99,21 +152,40 @@ facets: 'facet\_': split your plot according to a categorical variable
 
 ```{r}
 # Split the scatter plot according to the density categories
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha, fill=class, shape=class), size = 3, shape = 22)+
+  scale_fill_manual(values = c("Low" = "navy", "Medium" = "darkorange", "High"= "tomato"))+
+  facet_wrap(~class)
 
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha, color=yield_t.ha, shape=class), size = 3)
 ```
 
 ## f) Plot themes
 
 ```{r}
 # Default themes + customizables 
-
+df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha, fill=class, shape=class), size = 3, shape = 22)+
+  scale_fill_manual(values = c("Low" = "navy", "Medium" = "darkorange", "High"= "tomato"))+
+  theme_bw()+
+  theme(size = element_blank(size = 20))
 ```
 
 ## g) Saving plots
 
-```{r}
+```{r fig.height=4.5, fig.width=6}
 # Save in png and jpeg (dimensions, resolution, ...)
+plot <- df %>% 
+  ggplot()+
+  geom_point(aes(x=pl_m2, y=yield_t.ha, fill=class, shape=class), size = 3, shape = 22)+
+  scale_fill_manual(values = c("Low" = "navy", "Medium" = "darkorange", "High"= "tomato"))+
+  theme_bw()
 
+ggsave(plot = plot, filename = "images/plot1.jpeg", width = 6, height = 4.5, dpi = 300)
 ```
 
 # ---------------------------------------------------
@@ -219,6 +291,7 @@ unique(crop_info$Site_Prod)
 crop_info %>% 
   select(State, Yield_Bu, TotdryM, Plant_N) %>%
   pivot_longer(cols = c(Yield_Bu, TotdryM), names_to = "variable", values_to = "value") %>%
+  
   ggplot(aes(x = Plant_N, y = value))+
   geom_point(aes(color = State))+
   geom_smooth(se = F, color = "black")+
@@ -266,7 +339,7 @@ crop_info %>%
 
 ```{r}
 site_crop_info <- crop_info %>%
-  left_join(site_info, by = "Trial#")
+  left_join(site_info, by = c("Year", "Trial#"))
 ```
 
 ```{r}

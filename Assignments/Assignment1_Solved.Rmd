@@ -103,6 +103,11 @@ df <- df %>%
   mutate(across(c(TMIN, TMAX, RAIN), as.numeric))
 
 print(str(df))
+
+str(df)
+head(df)
+tail(df)
+glimpse(df)
 ```
 
 ### 2.3 Replace missing values
@@ -113,6 +118,9 @@ Some columns contain missing values coded as -99. Replace all instances of -99 w
 # Convert "-99" to NA in numeric columns using str_replace_all
 df_clean <- df %>%
   mutate(across(where(is.numeric), ~str_replace_all(as.character(.), "-99", "NA") %>% as.numeric()))
+
+df_clean <- df %>%
+  mutate(across(where(is.numeric), ~na_if(., -99)))
 ```
 
 ### 2.3 Calculate mean Tmax
