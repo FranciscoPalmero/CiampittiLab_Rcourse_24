@@ -8,10 +8,11 @@ output: html_document
 **Today's Overview:**
 
 -   Introduction to `for` loops in R
--   Using `map` functions from the `purrr` package as an alternative
 -   Writing simple functions to use within loops
+-   Using `map` functions from the `purrr` package as an alternative
 
-# Packages
+
+# 0. Packages
 
 ```{r}
 library(readxl)
@@ -19,7 +20,7 @@ library(tidyverse)
 library(lubridate)
 ```
 
-# Load data
+# 1. Load data
 
 ```{r}
 df_ks1 <- read_xlsx("../Data/Mult/weather_ks.xlsx", sheet = 1)
@@ -34,7 +35,9 @@ df_mi2 <- read_xlsx("../Data/Mult/weather_mi.xlsx", sheet = 2)
 glimpse(df_ks1)
 ```
 
-# What is a for loop?
+# 2. For loop
+
+What is a for-loop / for loop?
 
 -   Control flow statement for specifying iteration
 -   Run a section of code repeatedly until a certain condition has been satisfied
@@ -61,8 +64,6 @@ for (i in seq(1:10)) {
 #Sequence is a collection of values (like numbers or items in a list) that you want to loop through
 #The code inside the curly braces {} is what gets repeated
 ```
-
-## Looping examples
 
 ### Example 1
 
@@ -136,7 +137,6 @@ yields_df <- bind_cols(yields_df, total_yield_df)
 print(yields_df)
 ```
 
-    
 ### Example 5
 
 Problem: Wrangling across multiple excel files
@@ -220,11 +220,214 @@ combined_weather_df <- bind_rows(weather_dfs)
 print(combined_weather_df)
 ```
 
+# 2. Custom functions
+
+-   "Recipe" (inputs/process/output)
+-   Avoid repetition, cleaner code, reproducible
+
+## Basic structure
+
+-   Function name
+-   Arguments: inputs
+-   Code block `{ }`: steps the function should perform
+-   Return value: output
+
+```{r}
+my_function <- function(argument1, argument2) { 
+  result <- argument1 * argument2
+  return(result)
+}
+```
+
+### Example 1: 
+
+```{r}
+my_multiply <- function(value1, value2) {
+  multiplication <- value1 * value2
+  return(multiplication)
+}
+
+my_multiply(value1 = 4723974, value2 = .000001)
+```
+
+### Example 2
+
+```{r}
+clean_weather_xlsx <- function(file_path, sheet) {
+  
+  df <- read_excel(path = file_path, sheet = sheet)
+  
+  df_clean <- df %>%
+    dplyr::select(-c(DEWP:RHUM)) %>% 
+    mutate(DATE = as.Date(as.character(DATE), format = "%Y%j"),  
+           across(where(is.numeric), ~ na_if(., -99))) %>%
+    mutate(AMP = TMAX - TMIN,              
+           Avg_AMP = mean(AMP, na.rm = TRUE)) 
+  
+  return(df_clean)
+}
+
+df_clean <- clean_weather_xlsx(file_path = "../Data/Mult/weather_mi.xlsx", sheet = 1)
+```
+
+### Example 3
+
+```{r}
+plot_vars_vs_doy <- function(object_df) {
+  
+  weather_vars <- c("TMAX", "TMIN", "RAIN", "SRAD", "AMP")
+  
+  plots <- list()
+  
+  for (var in weather_vars) {
     
+    date_to_doy <- object_df %>% mutate(DOY = yday(DATE))
+    
+    p <- ggplot(date_to_doy, aes(x = DOY, y = .data[[var]])) + 
+      geom_line() +
+      labs(title = paste(var, "vs DOY"), x = "Day of year", y = var) +
+      theme_bw()
+    
+    plots[[var]] <- p
+  }
+  
+  return(plots)
+}
+
+plot_vars_vs_doy(object_df = df_clean)
+```
+
+# 3. Map
+
+-   `purrr` package
+-   More concise than for loops and integrate better with the `tidyverse` workflow
+
+## Basic structure
+
+-   `map(.x = list/vector/df, .f = function)`
+
+    -   .x is the list or vector you want to iterate over
+
+    -   .f is the function you want to apply to each element of .x
+
+    -   map() returns a list
+
+    -   Use a dot "." as a placeholder for the left-hand side of the pipe
+    
+    -   The utility of map with nested data
+
+### Example 1
+
+```{r}
+crop_vector <- c("soybean", "corn", "sorghum", "wheat")
+
+# Using map to print each crop
+map(crop_vector, ~ print(.x))
+
+# Using the pipe with map
+crop_vector %>% 
+  map(~ print(.x))
+```
+
+-   Map functions truly shine when dealing with nested data 
+-   Nested data refers to data structures within structures, such as lists within lists or grouped data frames
+
+### Example 2
+
+```{r}
+df_nested <- combined_weather_df %>% 
+  group_by(ID) %>% 
+  nest()
+  
+df_nested %>% 
+  mutate(n_days = map(data, ~ nrow(.)) %>% as.numeric(.),
+         n_cols = map(data, ~ ncol(.)) %>% as.numeric(.)) %>% 
+  unnest()
+```
+
+### Example 3
+
+```{r}
+df_nested_tmax <- df_nested %>% 
+  mutate(
+    tmax_plot = map(data, ~ ggplot(.x, aes(x = yday(DATE), y = TMAX)) +
+                           geom_line() +
+                           labs(x = "Day of year", y = "TMAX") +
+                           theme_minimal()))
+
+print(df_nested_tmax$tmax_plot[[1]])
+```
+
+### Example 4
+
+```{r}
+df_nested_map2 <- df_nested %>% 
+  mutate(
+    tmax_plot = map2(data, ID, ~ ggplot(.x, aes(x = yday(DATE), y = TMAX)) +
+                           geom_line() +
+                           labs(
+                             title = paste("TMAX vs DOY for", .y),  # Add ID to the title
+                             x = "DOY", 
+                             y = "TMAX") +
+                           theme_bw()))
+
+print(df_nested_map2$tmax_plot[[1]])
+df_nested_map2 %>% pull(tmax_plot)
+```
+
+### Example 5
+
+```{r}
+crop_data <- data.frame(
+  Crop = rep(c("Soybean", "Corn", "Wheat"), each = 5),
+  Year = rep(2015:2019, times = 3),
+  Yield = c(3.1, 3.3, 3.5, 3.4, 3.2, 8.1, 7.9, 8.3, 8.2, 8.0, 5.1, 5.3, 5.2, 5.4, 5.3))
+
+# Nest the data by Crop
+nested_crop_data <- crop_data %>%
+  group_by(Crop) %>%
+  nest()
+
+# View(data.frame)
+
+nested_crop_data <- nested_crop_data %>%
+  mutate(stats = pmap(.l = list(data, Crop),
+    ~ data.frame(
+      crop = ..2,
+      mean_Yield = mean(..1$Yield),  
+      sd_Yield = sd(..1$Yield), 
+      max_Yield = max(..1$Yield),
+      min_Yield = min(..1$Yield)
+    )
+  ))
+
+unnested_data <- nested_crop_data %>%
+  select(Crop, stats) %>%
+  unnest(cols = stats, names_sep = "_")
+
+print(unnested_data)
+```
 
 
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
