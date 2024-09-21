@@ -4,15 +4,15 @@ author: ""
 date: "`r Sys.Date()`"
 output:
   html_document:
-    theme: "cosmo" # This theme has a slight purple tone. You can customize it further with CSS.
+    theme: "cosmo" 
     highlight: tango
-    css: styles.css  # Optional: You can add custom styles in an external CSS file
+    css: styles.css  
   pdf_document:
     toc: true
     toc_depth: 2
     latex_engine: xelatex
     includes:
-      in_header: preamble.tex  # Optional: Add a LaTeX file to further control appearance
+      in_header: preamble.tex 
 ---
 
 ```{r setup, include=FALSE}
@@ -103,6 +103,11 @@ df <- df %>%
   mutate(across(c(TMIN, TMAX, RAIN), as.numeric))
 
 print(str(df))
+
+str(df)
+head(df)
+tail(df)
+glimpse(df)
 ```
 
 ### 2.3 Replace missing values
@@ -113,6 +118,9 @@ Some columns contain missing values coded as -99. Replace all instances of -99 w
 # Convert "-99" to NA in numeric columns using str_replace_all
 df_clean <- df %>%
   mutate(across(where(is.numeric), ~str_replace_all(as.character(.), "-99", "NA") %>% as.numeric()))
+
+df_clean <- df %>%
+  mutate(across(where(is.numeric), ~na_if(., -99)))
 ```
 
 ### 2.3 Calculate mean Tmax
