@@ -1,0 +1,230 @@
+---
+title: "4 For Loops & Map & Function"
+author: "Luiz Felipe & Francisco"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+**Today's Overview:**
+
+-   Introduction to `for` loops in R
+-   Using `map` functions from the `purrr` package as an alternative
+-   Writing simple functions to use within loops
+
+# Packages
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(lubridate)
+```
+
+# Load data
+
+```{r}
+df_ks1 <- read_xlsx("../Data/Mult/weather_ks.xlsx", sheet = 1)
+df_ks2 <- read_xlsx("../Data/Mult/weather_ks.xlsx", sheet = 2)
+
+df_ne1 <- read_xlsx("../Data/Mult/weather_ne.xlsx", sheet = 1)
+df_ne2 <- read_xlsx("../Data/Mult/weather_ne.xlsx", sheet = 2)
+
+df_mi1 <- read_xlsx("../Data/Mult/weather_mi.xlsx", sheet = 1)
+df_mi2 <- read_xlsx("../Data/Mult/weather_mi.xlsx", sheet = 2)
+
+glimpse(df_ks1)
+```
+
+# What is a for loop?
+
+-   Control flow statement for specifying iteration
+-   Run a section of code repeatedly until a certain condition has been satisfied
+
+## Basic structure
+
+-   Header: defines the iteration
+
+    -   Loop counter or loop variable
+
+    -   Number of iterations is known before entering the loop
+
+-   Body: code that is executed once per iteration
+
+```{r}
+# i is the loop variable that takes each value from 1 to 10
+# print(i) is the code that runs each time the loop iterates
+
+for (i in seq(1:10)) {
+  print(i)
+}
+
+#Variable is a placeholder that takes on each value in the sequence
+#Sequence is a collection of values (like numbers or items in a list) that you want to loop through
+#The code inside the curly braces {} is what gets repeated
+```
+
+## Looping examples
+
+### Example 1
+
+```{r}
+crop_vector <- c("soybean", "corn", "sorghum", "wheat")
+
+for (crop in crop_vector) {
+  print(crop)
+}
+```
+
+### Example 2
+
+```{r}
+yields_ks <- c(4100, 5000, 5300, 2600, 3200)
+
+for (i in 1:length(yields_ks)) {
+  
+  yield_kgha <- yields_ks[i] / 1000
+  print(yield_kgha)
+
+  }
+```
+
+### Example 3
+
+```{r}
+yields_kgha <- c(4100, 5000, 5300, 2600, 3200)
+
+yields_ton <- c()  # Empty vector
+
+for (i in 1:length(yields_kgha)) {
+  
+  yield_temp <- yields_kgha[i] / 1000  # Convert (save in a temporary object)
+  yields_ton <- c(yields_ton, yield_temp)  # Append results
+  
+}
+
+print(yields_ton) # Yield in ton/ha
+```
+
+### Example 4
+
+```{r}
+yields_df <- data.frame(
+  Crop = c("soybean", "corn", "sorghum"),
+  Yield_NorthFarm = c(4, 8, 6),
+  Yield_Ashland = c(3, 7, 5))
+
+print(yields_df)
+
+
+# Empty object to store new data
+total_yield_df <- NULL
+
+# Loop over each row to calculate total yield for each crop
+for (i in 1:nrow(yields_df)) {
+  
+  total_yield <- yields_df %>% 
+    slice(i) %>%  
+    mutate(Cumulative = Yield_NorthFarm + Yield_Ashland) %>%  
+    select(Cumulative)  
+  
+  total_yield_df <- bind_rows(total_yield_df, total_yield)
+}
+
+print(total_yield_df)
+
+yields_df <- bind_cols(yields_df, total_yield_df)
+
+print(yields_df)
+```
+
+    
+### Example 5
+
+Problem: Wrangling across multiple excel files
+
+```{r}
+df_all_weather <- read_xlsx("../Data/Mult/weather_ks.xlsx", sheet = "ks_2013") %>%
+  mutate(ID = "ks_2013") %>%
+  rbind(
+    read_xlsx("../Data/Mult/weather_mi.xlsx", sheet = "mi_2013") %>%
+      mutate(ID = "mi_2013")
+  ) %>%
+  rbind(
+    read_xlsx("../Data/Mult/weather_ne.xlsx", sheet = "ne_2013") %>%
+      mutate(ID = "ne_2013")
+  ) %>%
+  rbind(
+    read_xlsx("../Data/Mult/weather_ks.xlsx", sheet = "ks_2020") %>%
+      mutate(ID = "ks_2020")
+  ) %>%
+  rbind(
+    read_xlsx("../Data/Mult/weather_mi.xlsx", sheet = "mi_2020") %>%
+      mutate(ID = "mi_2020")
+  ) %>%
+  rbind(
+    read_xlsx("../Data/Mult/weather_ne.xlsx", sheet = "ne_2020") %>%
+      mutate(ID = "ne_2020"))
+
+df_all_weather_clean <- df_all_weather %>%
+  dplyr::select(-c(DEWP:RHUM)) %>% 
+  mutate(DATE = as.Date(as.character(DATE), format = "%Y%j"),  
+         across(where(is.numeric), ~ na_if(., -99))) %>%
+  group_by(ID) %>%  
+  mutate(AMP = TMAX - TMIN,
+         Avg_AMP = mean(AMP, na.rm = TRUE))
+```
+
+Let's try some automation
+
+```{r}
+file_paths_test <- list.files(path = "../Data/Mult/", pattern = "weather", full.names = TRUE)
+
+sheet_names_test <- excel_sheets(file_paths[1])
+
+read_xlsx(file_paths_test[1], sheet = sheet_names_test[1]) %>%
+  dplyr::select(-c(DEWP:RHUM)) %>% 
+  mutate(DATE = as.Date(as.character(DATE), format = "%Y%j"),  
+         across(where(is.numeric), ~ na_if(., -99))) %>%
+  mutate(AMP = TMAX - TMIN,
+         Avg_AMP = mean(AMP, na.rm = TRUE))
+```
+
+Let's loop it!!
+
+```{r}
+file_paths <- list.files(path = "../Data/Mult/", pattern = "weather", full.names = TRUE)
+
+weather_dfs <- data.frame(NULL)
+
+for (file in seq_along(file_paths)) {
+  
+  sheet_names <- excel_sheets(file_paths[file])
+  
+  for (sheet in sheet_names) {
+    
+    temp_df <- read_xlsx(file_paths[file], sheet = sheet) %>%
+      dplyr::select(-c(DEWP:RHUM)) %>%                      
+      mutate(
+        DATE = as.Date(as.character(DATE), format = "%Y%j"),  
+        across(where(is.numeric), ~ na_if(., -99))) %>%
+      mutate(
+        AMP = TMAX - TMIN,                                      
+        Avg_AMP = mean(AMP, na.rm = TRUE)) %>%
+      mutate(ID = sheet)                                 
+    
+    weather_dfs <- rbind(weather_dfs, temp_df)
+  }
+}
+
+combined_weather_df <- bind_rows(weather_dfs)
+
+print(combined_weather_df)
+```
+
+    
+
+
+    
+    
+    
+    
+    
