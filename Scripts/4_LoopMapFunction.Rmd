@@ -60,9 +60,15 @@ for (i in seq(1:10)) {
   print(i)
 }
 
-#Variable is a placeholder that takes on each value in the sequence
-#Sequence is a collection of values (like numbers or items in a list) that you want to loop through
-#The code inside the curly braces {} is what gets repeated
+for (placeholder in seq(1:5)) {
+  
+  print(placeholder)
+
+  }
+
+# Variable is a placeholder that takes on each value in the sequence
+# Sequence is a collection of values (like numbers or items in a list) that you want to loop through
+# The code inside the curly braces {} is what gets repeated
 ```
 
 ### Example 1
@@ -70,9 +76,14 @@ for (i in seq(1:10)) {
 ```{r}
 crop_vector <- c("soybean", "corn", "sorghum", "wheat")
 
-for (crop in crop_vector) {
-  print(crop)
+for (i in 1:length(crop_vector)) {
+  print(crop_vector[i])
 }
+
+for (i in crop_vector) {
+  print(i)
+}
+
 ```
 
 ### Example 2
@@ -84,7 +95,7 @@ for (i in 1:length(yields_ks)) {
   
   yield_kgha <- yields_ks[i] / 1000
   print(yield_kgha)
-
+  
   }
 ```
 
@@ -93,12 +104,13 @@ for (i in 1:length(yields_ks)) {
 ```{r}
 yields_kgha <- c(4100, 5000, 5300, 2600, 3200)
 
-yields_ton <- c()  # Empty vector
+yields_ton <- c(NULL)  # Empty vector
 
 for (i in 1:length(yields_kgha)) {
   
   yield_temp <- yields_kgha[i] / 1000  # Convert (save in a temporary object)
   yields_ton <- c(yields_ton, yield_temp)  # Append results
+  # print(yields_ton)
   
 }
 
@@ -178,9 +190,9 @@ Let's try some automation
 ```{r}
 file_paths_test <- list.files(path = "../Data/Mult/", pattern = "weather", full.names = TRUE)
 
-sheet_names_test <- excel_sheets(file_paths[1])
+sheet_names_test <- excel_sheets(file_paths_test[1])
 
-read_xlsx(file_paths_test[1], sheet = sheet_names_test[1]) %>%
+read_xlsx(file_paths_test[1], sheet = sheet_names_test[2]) %>%
   dplyr::select(-c(DEWP:RHUM)) %>% 
   mutate(DATE = as.Date(as.character(DATE), format = "%Y%j"),  
          across(where(is.numeric), ~ na_if(., -99))) %>%
@@ -199,19 +211,19 @@ for (file in seq_along(file_paths)) {
   
   sheet_names <- excel_sheets(file_paths[file])
   
-  for (sheet in sheet_names) {
+   for (sheet in sheet_names) {
+     
+     temp_df <- read_xlsx(file_paths[file], sheet = sheet) %>%
+       dplyr::select(-c(DEWP:RHUM)) %>%                      
+       mutate(
+         DATE = as.Date(as.character(DATE), format = "%Y%j"),  
+         across(where(is.numeric), ~ na_if(., -99))) %>%
+       mutate(
+         AMP = TMAX - TMIN,                                      
+         Avg_AMP = mean(AMP, na.rm = TRUE)) %>%
+       mutate(ID = sheet)                                 
     
-    temp_df <- read_xlsx(file_paths[file], sheet = sheet) %>%
-      dplyr::select(-c(DEWP:RHUM)) %>%                      
-      mutate(
-        DATE = as.Date(as.character(DATE), format = "%Y%j"),  
-        across(where(is.numeric), ~ na_if(., -99))) %>%
-      mutate(
-        AMP = TMAX - TMIN,                                      
-        Avg_AMP = mean(AMP, na.rm = TRUE)) %>%
-      mutate(ID = sheet)                                 
-    
-    weather_dfs <- rbind(weather_dfs, temp_df)
+   weather_dfs <- rbind(weather_dfs, temp_df)
   }
 }
 
@@ -247,7 +259,7 @@ my_multiply <- function(value1, value2) {
   return(multiplication)
 }
 
-my_multiply(value1 = 4723974, value2 = .000001)
+my_multiply(value1 = 209470927, value2 = 0.00001)
 ```
 
 ### Example 2
@@ -267,7 +279,7 @@ clean_weather_xlsx <- function(file_path, sheet) {
   return(df_clean)
 }
 
-df_clean <- clean_weather_xlsx(file_path = "../Data/Mult/weather_mi.xlsx", sheet = 1)
+clean_weather_xlsx(file_path = "../Data/Mult/weather_ks.xlsx", sheet = 1)
 ```
 
 ### Example 3
@@ -338,6 +350,8 @@ crop_vector %>%
 df_nested <- combined_weather_df %>% 
   group_by(ID) %>% 
   nest()
+
+View(df_nested)
   
 df_nested %>% 
   mutate(n_days = map(data, ~ nrow(.)) %>% as.numeric(.),
@@ -355,7 +369,7 @@ df_nested_tmax <- df_nested %>%
                            labs(x = "Day of year", y = "TMAX") +
                            theme_minimal()))
 
-print(df_nested_tmax$tmax_plot[[1]])
+print(df_nested_tmax$tmax_plot[1])
 ```
 
 ### Example 4
@@ -387,6 +401,8 @@ crop_data <- data.frame(
 nested_crop_data <- crop_data %>%
   group_by(Crop) %>%
   nest()
+
+View(nested_crop_data)
 
 # View(data.frame)
 
