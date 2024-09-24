@@ -26,7 +26,7 @@ At the end of this course, we expect that people taking the course can apply the
 | 4   | 09/23/2024 | Iteration: map functions, for loops. Functions |
 | 5   | 09/30/2024 | Data acquisition (grid and ground data)  |
 | 6   | 10/07/2024 | Experimental Design |
-| 7   | 10/14/2024 | Linear model I |
+| 7   | 10/14/2024 | Linear models I |
 | 8   | 10/21/2024 | Linear models II |
 | 9   | 11/01/2024 | Mixed Models I  |
 | 10  | 11/04/2024 |  Mixed Models II |
