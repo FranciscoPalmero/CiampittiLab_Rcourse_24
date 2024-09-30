@@ -5,13 +5,6 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-**Today's Overview:**
-
--   Introduction to `for` loops in R
--   Writing simple functions to use within loops
--   Using `map` functions from the `purrr` package as an alternative
-
-
 # 0. Packages
 
 ```{r}
@@ -288,9 +281,6 @@ gif_us <- ggplot(df_yield_us, aes(x = year, y = mean_yield)) +
 
 animate(gif_us, nframes = 200, fps = 10, width = 800, height = 600, renderer = gifski_renderer("images/nass_usa.gif"))
 ```
-
-
-
 
 
 
