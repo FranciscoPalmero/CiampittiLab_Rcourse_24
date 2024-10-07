@@ -1,0 +1,507 @@
+---
+title: ""
+output: html_document
+---
+
+<style>
+h1 {
+  font-size: 40px;
+}
+h2 {
+  font-size: 35px;
+}
+h3 {
+  font-size: 30px;
+}
+h4 {
+  font-size: 25px;
+}
+</style>
+
+
+
+<style type="text/css">
+   body{
+   font-size: 18pt;
+ }
+</style>
+
+
+```{r error=FALSE,message=FALSE,warning=FALSE,echo=FALSE}
+library(tidyverse)
+```
+
+
+## The main objectives in statistics:
+
+- **Estimation** (point and uncertainty)
+
+- **Inference (hypothesis testing)**
+
+- **Prediction**
+
+$$\\[0.3cm]$$
+
+# Experimental Design
+
+
+Usually in statistics we want to estimate the effect of a variable (treatment) on a another variable (response).
+
+# Types of study:
+
+- **Observational studies**: we have no control of which units are assigned the treatment
+
+- **Controlled experiment**: we can assign treatment to units -> prevent confounding covariates from affecting the estimation of treatment effects
+
+
+The *design* of the experiment means how treatments are assigned to units and how data is collected before the analysis.
+
+$$\\[0.3cm]$$
+
+# Terminology
+
+- **Factor** is a variable that is under the control of the researcher 
+
+<div style="border: 1px solid black; padding: 10px; font-size: 20px;">
+  **Single factor experiment**: one variable under control
+  
+  **Multi-factor experiment**: more than one variable under control
+</div>
+
+
+- **Levels** are the different values that the factor can take in a particular experiment.
+
+- **Treatment** is the combination of levels of the factors in a particular experiment. 
+
+
+The **control** represent the status quo, i.e. what is the response if we have no intervetion.
+
+ How to define the "control"? Different ways.
+
+- **Experimental unit** is the object to which the treatment is applied
+
+- **Observational Unit** is the object in which we take the measurements of the response variable
+
+- **Repetition** is the # of times that the treatment is applied to experimental units
+
+*Balanced* -> all treatments have the same # of repetitions, *unbalanced* o.w.
+
+$$\\[0.1cm]$$
+
+### Example:
+
+We want to find the P rate that maximizes soybean yield and also test if that rate changes over the most used/adapted varieties in a given region
+
+   i) 4 rates of P and 2 soybean varieties
+   
+   ii) We have 24 plots to carry out the experiment
+   
+   iii) We know that the 4 eastern-most plots have higher fertility than the rest of the plots
+   
+   iv) We apply each treatments to 3 different plots at random
+   
+   v) At maturity we obtain the grain yield of each plot 
+   
+$$\\[0.1cm]$$
+
+1) What is/are the factor/s?
+2) Ho many levels of the factor/s are there?
+3) How many treatments are there?
+4) What are the experimental units?
+5) What are the observational units?
+6) How many repetitions of each treatment are there?
+7) What is the response variable?
+8) What is a potential confounder variable?
+9) Consideing this randomization scheme, can a treatment condition be given only to the most fertile plots?
+10) What might be the consequence of this when analyzing the data?
+11) How can we solve this issue?
+
+
+$$\\[0.3cm]$$
+
+# ANOVA: Sources of errors
+
+**Hypothesis**
+
+Full model -> $y_{ij} = \mu_j + \epsilon_{ij}$
+
+Reduced model -> $y_{ij} = \mu + \epsilon_{ij}$
+
+
+Based on these models, we partition the total sum of squares to identify the main **sources of variation** in our experiment, i.e. **is the variability due to treatments or is the variability just random?** 
+
+$$SS~Total = SS~Treatment + SS~Error$$
+
+or
+
+$$\sum_{i=1}^r \sum_{j=1}^t \left( y_{ij} - \bar{y}_{..}\right) = \sum_{j=1}^t \left( \bar{y}_{.j} -  \bar{y}_{..}\right)^2 + \sum_{i=1}^r \sum_{j=1}^t \left( \bar{y}_{ij} -  \bar{y}_{.j}\right)^2$$
+
+
+$$\\[0.3cm]$$
+
+# Completely Randomized Design (CRD)
+
+When is the CRD a good option? -> Units under study are homogeneous, i.e. there is no considerable variability across units.
+
+## Characteristics of CRD
+- There are two or more treatments
+- The # of repetitons is defined before randomization
+- Experimental units and observational units are the same
+- Each experimental unit under study receives exactly one treatment condition
+
+
+$$\\[0.1cm]$$
+
+## Model of response for CRD with One Factor
+
+**Means model**
+$$y_{ik} = \mu_k + \epsilon_{ik}$$
+
+$y_{ik}$ is the response of the *ith* exp. unit given treatment *k*
+$\mu_k$ is the population mean of treatment *k*
+$\epsilon_{ik}$ is the experimental error
+
+
+**Effects model**
+$$y_{ik} = \mu + \tau_k + \epsilon_{ik}$$
+
+$y_{ik}$ is the response of the *ith* exp. unit given treatment *k*
+
+$\mu$ is the overall mean
+
+$\tau_k$ is the effect of treatment *k* as deviation from the overall mean
+
+$\epsilon_{ik}$ is the experimental error
+
+
+For this course (as it is usual), we have the following **assumptions** over $\epsilon_{ik}$:
+
+i) The $\epsilon_{ik}$ are independent
+ii) The mean of the $\epsilon_{ik}$ is 0
+iii) All the $\epsilon_{ik}$ have the same standard deviation $\sigma$
+iv) The $\epsilon_{ik}$ are normally distributed
+
+
+$$\\[0.15cm]$$
+
+## ANOVA Table For a CRD with One Factor
+```{r error=FALSE,message=FALSE,warning=FALSE,echo=FALSE}
+
+TABLE1 <- tribble(
+  ~"", ~"Sum of Squares", ~"df", ~"Mean Squares", ~"F",
+  "Treatment", "SST", "K-1", "MST", "MST/MSE",
+  "Error", "SSE", "n-K", "MSE", "",
+  "Total", "SSTot", "n-1", "", ""
+  
+)
+
+knitr::kable((TABLE1), booktabs = TRUE)
+```
+
+Where:
+
+
+$$SST = n_k \sum_{k=1}^K \left( \bar{y}_{.k} - \bar{y}_{..} \right)^2$$
+
+
+$$SSE = \sum_{k=1}^K \sum_{i=1}^{n_k} \left( y_{ik} - \bar{y}_{.k} \right)^2$$
+
+The $MSE = \frac{SSE}{df} = \frac{SSE}{n-K}$ is an unbiased estimator if $\sigma^2_{\epsilon}$.
+
+
+$$SSTot = \sum_{k=1}^K \sum_{i=1}^{n_k} \left(y_{ik}-\bar{y}_{..} \right)^2$$
+
+
+$\frac{SSTot}{n-1}=Sample~variance~of~y$
+
+$SSTot = SST+SSE$.
+
+
+$$\\[0.2cm]$$
+
+## Model of response for CRD with Two Factors (Bifactorial Experiment)
+
+$$\\[0.05cm]$$
+
+**Effects model**
+$$y_{iab} = \mu + \theta_a + \gamma_b + \delta_{ab} + \epsilon_{iab}$$
+
+$y_{iab}$ is the response of the *ith* exp. unit given level *a* of Factor A and level *b* of Factor B
+
+$\mu$ is the overall mean
+
+$\theta_a$ is the main effect of level *a* of Factor A
+
+$\gamma_b$ is the main effect of level *b* of Factor B
+
+$\delta_{ab}$ is the interaction effect of level *a* of Factor A and level *b* of Factor B
+
+$\epsilon_{iab}$ is the experimental error
+
+$$\epsilon_{iab} \overset{\text{i.i.d.}}{\sim}  N(0,\sigma^2) $$
+
+
+$$\\[0.05cm]$$
+
+
+How to interpret the interaction?
+
+
+$$\\[0.3cm]$$
+
+## ANOVA Table for a CRD with Two Factors
+```{r error=FALSE,message=FALSE,warning=FALSE,echo=FALSE}
+
+TABLE1 <- tribble(
+  ~"", ~"Sum of Squares", ~"df", ~"Mean Squares", ~"F",
+  "Factor A", "SSA", "K₁-1", "MSA", "MSA/MSE",
+  "Factor B", "SSB", "K₂-1", "MSB", "MSB/MSE",
+  "Factor A*Factor B", "SSAB", "(K₁-1)(K₂-1)", "MSAB", "MSAB/MSE",
+  "Error", "SSE", "(r-1)K₁K₂", "MSE", "",
+  "Total", "SSTot", "rK₁K₂-1", "", ""
+  
+)
+
+knitr::kable((TABLE1), booktabs = TRUE)
+```
+
+Where:
+
+$$SSA = rK_2 \sum_{a=1}^{K_1} \left(\bar{y}_{.a.} - \bar{y}_{...} \right)^2$$
+
+$$SSB = rK_1 \sum_{b=1}^{K_2} \left(\bar{y}_{..b} - \bar{y}_{...} \right)^2$$
+
+$$SSAB = r \sum_{a=1}^{K_1} \sum_{b=1}^{K_2} \left(\bar{y}_{.ab} - \bar{y}_a - \bar{y}_b + \bar{y}_{...}\right)^2$$
+
+
+$$SSE = \sum_{a=1}^{K_1} \sum_{b=1}^{K_2} \sum_{i=1}^r \left(y_{iab} - \bar{y}_{ab.} \right)^2$$
+
+$$SSTot = \sum_{a=1}^{K_1} \sum_{b=1}^{K_2} \sum_{i=1}^r \left(y_{iab} - \bar{y}_{...} \right)^2$$
+
+
+$$\\[0.3cm]$$
+
+# Randomized Complete Block Design (RCBD)
+When is the RCBD a good option? -> Possible confounding covariates are identified prior to the experiment
+
+
+## Characteristics of RCBD
+- There is an experiment with K treatment ($K \ge 2$)
+
+- Experimental units are divided into B blocks of size K
+
+- Treatments are completely randomized within each block and independently across blocks.
+
+- Experimental units and observational units are the same
+
+$$\\[0.05cm]$$
+
+**Effects model**
+$$y_{ibk} = \mu + \alpha_k + \beta_b + \epsilon_{ibk}$$
+$$\epsilon_{ibk} \overset{\text{i.i.d.}}{\sim}  N(0,\sigma^2) $$
+
+
+$y_{ibk}$ The response of the i th unit given treatment *k* in block *b*.
+
+$\mu$ is the overall mean
+
+$\alpha_k$ is the treatment effect for treatment *k*
+
+$\beta_b$ is the block effect for block *b*
+
+$\epsilon_{ibk}$ is the experimental error
+
+$$\\[0.05cm]$$
+
+*Note*: the contribution of a block on the response of an experimental unit does not depend on which treatment k is given to that unit, in other words **there is no treatment by block interaction**
+
+
+$$\\[0.15cm]$$
+
+## ANOVA Table for a RCBD with One Factor
+```{r error=FALSE,message=FALSE,warning=FALSE,echo=FALSE}
+
+TABLE1 <- tribble(
+  ~"", ~"Sum of Squares", ~"df", ~"Mean Squares", ~"F",
+  "Factor", "SST", "K-1", "MST", "MST/MSE",
+  "Block", "SSB", "B-1", "MSB", "MSB/MSE",
+  "Error", "SSE", "(K-1)(B-1)", "MSE", "",
+  "Total", "SSTot", "BK-1", "", ""
+  
+)
+
+knitr::kable((TABLE1), booktabs = TRUE)
+```
+
+
+Where: 
+
+$$SST = B \sum_{k=1}^K \left( \bar{y}_{.k} - \bar{y}_{..} \right)^2$$
+
+$$SSB = K \sum_{b=1}^B \left( \bar{y}_{b.} - \bar{y}_{..} \right)^2$$
+
+
+$$SSE = \sum_{k=1}^K \sum_{b=1}^B \left( y_{bk} - \bar{y}_{.k} - \bar{y}_{b.} + \bar{y}_{..} \right)^2$$
+
+$$SSTot = \sum_{k=1}^K \sum_{b=1}^B \left( y_{bk} - \bar{y}_{..} \right)^2$$
+
+
+$$\\[0.3cm]$$
+
+# Split Plot Design.
+
+When is the Split Plot Design a good option? -> when it is harder to randomize one factor than another
+
+
+## Characteristics of Split Plot Design
+
+- There are two experimental factors: Factor A and Factor B
+
+- There are two sizes of experimental units
+
+<div style="border: 1px solid black; padding: 10px; font-size: 20px;">
+  **Large experimental units** -> "plots"
+  
+  **Small experimental units** -> "subplots"
+</div>
+      
+
+- The levels of the factors are randomized separately. Factor A is randomized across plots and Factor B is randomized within subplots.  
+
+- Randomization of Factor A to plots can be performed via complete randomization or block randomization (so we can have a split-plot design with a complete randomized structure)
+    
+
+$$\\[0.05cm]$$
+      
+**Effects model** for Split Plot Design in **RCBD** scheme
+$$y_{ijk} = \mu + \alpha_j + \rho_i + \delta_{ij} + \beta_k + (\alpha\beta)_{jk} + \epsilon_{ijk},$$
+
+$$\delta_{ij} \overset{\text{i.i.d.}}{\sim}  N(0,\sigma^2_w), $$
+
+
+$$\epsilon_{ibk} \overset{\text{i.i.d.}}{\sim}  N(0,\sigma^2_{\epsilon}).$$
+
+Furthermore $\delta_{ij}$ and $\epsilon_{ibk}$ are independent.
+
+$y_{ijk}$ is the response corresponding to the ith block, the j level of factor A, the k level of factor B.
+
+$\mu$ is the overall mean
+
+$\alpha_j$ is the effect of the j level of factor A
+
+$\rho_i$ is the effect of the ith block
+
+$\delta_{ij}$ is the whole-plot random error
+
+$\beta_k$ is the effect of the k level of factor B
+
+$(\alpha\beta)_{jk}$ is the interaction effect of level j of Factor A and level k of Factor B
+
+$\epsilon_{ijk}$ is the subplot random error
+
+
+$$\\[0.15cm]$$
+
+## ANOVA Table for Split Plot Design in RCBD scheme
+```{r error=FALSE,message=FALSE,warning=FALSE,echo=FALSE}
+
+TABLE1 <- tribble(
+  ~"", ~"Sum of Squares", ~"df", ~"Mean Squares", ~"F",
+  "Factor A", "SSA", "a-1", "MST", "MSA/MSWP",
+  "Block", "SSBl", "r-1", "MSBl", "MSBl/MSWP",
+  "Whole Plot Error", "SSWP", "(a-1)(r-1)", "MSWP", "",
+  "Factor B", "SSB", "b-1", "MSB", "MSB/MSSP",
+  "Factor A*Factor B", "SSAB", "(a-1)(b-1)", "MSAB", "MSAB/MSSP",
+  "Sub Plot Error", "SSSP", "(r-1)a(b-1)", "MSSP", "",
+  "Total", "SSTot", "abr-1", "", ""
+  
+)
+
+knitr::kable((TABLE1), booktabs = TRUE)
+```
+
+
+Where: 
+
+$$SSA = rb \sum_{j=1}^a \left( \bar{y}_{.j.}-\bar{y}_{...}  \right)^2$$
+
+$$SSBl = ab \sum_{i=1}^r \left( \bar{y}_{i..}-\bar{y}_{...}  \right)^2$$
+
+$$SSWP = b \sum_{i=1}^r \sum_{j=1}^a \left( \bar{y}_{ij.}-\bar{y}_{i..}-\bar{y}_{.j.}+\bar{y}_{...}\right)^2$$
+
+$$SSB = ar \sum_{k=1}^b \left( \bar{y}_{..k}-\bar{y}_{...}  \right)^2$$
+
+
+$$SSAB = r \sum_{j=1}^a \sum_{i=1}^r \left( \bar{y}_{.jk}-\bar{y}_{.j.}-\bar{y}_{..k}+\bar{y}_{...}\right)^2$$
+
+
+$$SSSP = \sum_{i=1}^r \sum_{j=1}^a \sum_{k=1}^b \left(y_{ijk}-\bar{y}_{.jk}-\bar{y}_{ij.}+\bar{y}_{.j.}\right)^2$$
+
+$$SSTot = \sum_{i=1}^r \sum_{j=1}^a \sum_{k=1}^b \left(y_{ijk}-\bar{y}_{...}\right)^2$$
+
+$$\\[0.3cm]$$
+
+# Other designs used in Agriculture
+
+- Incomplete Block Designs
+
+- Latin Square Designs
+
+- Repeated Measures
+
+$$\\[0.3cm]$$
+
+
+
+
+# Hypothesis Testing
+
+1) We have a question
+2) Collect and summarize evidence
+3) Evaluate the strength of the evidence
+4) Conclusion
+
+The hypothesis testing works by a proof of contradiction, i.e. 
+
+i) we assume our scientific claim is false 
+ii) we prove that the data is unlikely to occur if our claim is false
+iii) conclude that our scientific claim is true
+
+However, we can make mistakes when making conclusions.
+
+$$\\[0.05cm]$$
+
+|  | $H_0~Not~False$ | $H_0~False$ |
+| --- | ------- | ----------- |
+|Reject $H_0$| Type I Error ($\alpha$) | Correct  (1-$\beta$) |
+|Not Reject $H_0$  | Correct (1-$\alpha$) | Type II Error ($\beta$) |
+
+
+$$\\[0.05cm]$$
+
+- We test the hypotheses by computing a **statitic**
+
+- Under the $H_0$ this statistic follow a known probability distribution
+
+- The distribution of the statistic will depend on the model of response for our data
+
+- Since we will assume $\epsilon_i \overset{\text{i.i.d.}}{\sim}  N(0,\sigma^2)$, we will use **F-statistics** and **t-statistics**.
+
+
+$$\\[0.15cm]$$
+
+# Next Time
+
+Linear Model:
+
+  - Point Estimation (LSE)
+  
+  - Uncertainty estimation
+  
+  - Model Checking
+  
+  - Hypothesis testing
+
+
+
+
