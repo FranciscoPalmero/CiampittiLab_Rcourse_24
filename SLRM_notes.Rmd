@@ -1,0 +1,241 @@
+---
+title: ""
+output: html_document
+---
+
+<style>
+h1 {
+  font-size: 40px;
+}
+h2 {
+  font-size: 35px;
+}
+h3 {
+  font-size: 30px;
+}
+h4 {
+  font-size: 25px;
+}
+</style>
+
+
+
+<style type="text/css">
+   body{
+   font-size: 18pt;
+ }
+</style>
+
+## The main objectives in statistics:
+
+- **Estimation** (point and uncertainty)
+
+- **Inference** (hypothesis testing)
+
+- **Prediction**
+
+$$\\[0.3cm]$$
+
+# Simple Linear Regression Model
+
+The simple linear regression model for n observations is
+
+$$y_i = \beta_0 + \beta_1x_i + \epsilon_i,$$
+
+$$for ~ i=1,2,...,n$$
+
+The $y_i's$ and $\epsilon_i's$ are **random variables**, while the $x_i's$ are known constants.
+
+
+$$\\[0.1cm]$$
+**Identifying linear models**
+
+$y_i = \beta_0+\beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_k x_{ik} + \epsilon_{i}$
+
+$y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \epsilon_{i}$
+
+$y_i = \beta_0+ e^{\beta_1 x_i} + \epsilon_{i}$
+
+$y_i = \beta_0+ e^{x_i} + \epsilon_{i}$
+
+
+$$\\[0.3cm]$$
+
+
+# Estimation
+
+We will use the **least-square estimation** (LSE) procedure to estimate the parameters in $y_i = \beta_0 + \beta_1 x_i + \epsilon_i$. 
+
+For obtaining good properties of the LSE we will assume for this simple linear regression model that:
+
+(i) $E[\epsilon_i] = 0$ or equivalently $E[y_i] = \beta_0 + \beta_1 x_i$, for all $i=1,2,...,n$.
+
+(ii) $var(\epsilon_i) = \sigma^2$ or equivalently $var(y_i) = \sigma^2$, for all $i=1,2,...,n$.
+
+(iii) $cov(\epsilon_i, \epsilon_j)=0$ or equivalently $cov(y_i, y_j)=0$, for $i \neq j$.
+
+$$\\[0.1cm]$$
+
+*Note*: The LSE does **not** need any **distributional assumption** in order to get good properties.
+
+In the least-squares approach we seek for $\hat{\beta_0}$ and $\hat{\beta_1}$ such that the sum of squares of the deviations $y_i-\hat{y_i}$ of the $n$ observed $y_i's$ is minimized. If $\hat{\epsilon}_i = y_i-\hat{y}_i$, then the LSE can be written as:
+
+$$\sum_{i=n}^n \hat{\epsilon}_i^2 = \sum_{i=n}^n \left( y_i-\hat{y}_i \right)^2 = \sum_{i=n}^n \left( y_i-\hat{\beta_0}-\hat{\beta_1} x_i \right)^2$$
+
+*Note*: be aware that $\hat{y}_i$ estimates $E[y_i]$, not $y_i$.
+
+
+To find the values of $\hat{\beta_0}$ and $\hat{\beta_1}$ that minimize $\sum_{i=n}^n \hat{\epsilon}_i^2$, we differentiate $\sum_{i=n}^n \hat{\epsilon}_i^2$ with respect to $\hat{\beta_0}$ and $\hat{\beta_1}$, set the results equal to zero, and solve for $\hat{\beta_0}$ and $\hat{\beta_1}$. After doing so,
+
+$$\hat{\beta_1} = \frac{\sum_{i=1}^n \left( x_i - \bar{x} \right) \left( y_i - \bar{y} \right) }{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2 }$$
+
+$$\hat{\beta_0} = \bar{y}-\hat{\beta_1}\bar{x}$$
+
+
+If the previous assumptions are met, then:
+
+$$E[\hat{\beta}_1] = \beta_1$$
+
+$$E[\hat{\beta}_0] = \beta_0$$
+
+$$var(\hat{\beta}_1) = \frac{\sigma^2}{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2}$$
+
+$$var(\hat{\beta}_0) = \sigma^2 \left[ \frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2} \right]$$
+
+
+$$\\[0.2cm]$$
+
+**What about $\sigma^2$?**
+
+
+Minimizing $\sum_{i=n}^n \hat{\epsilon}_i^2$ does not provide an estimate of $var(y_i)=\sigma^2$. However, by the definition of the variance and assumption (i), we have:
+
+$$\hat{\sigma}^2 = \frac{\sum_{i=n}^n \left( y_i-\hat{y}_i \right)^2}{n-2} = \frac{\sum_{i=n}^n \left( y_i-\hat{\beta_0}-\hat{\beta_1} x_i \right)^2}{n-2}$$
+
+
+ We can also prove that $E[\hat{\sigma}^2]= \sigma^2$.
+ 
+
+
+$$\\[0.3cm]$$
+
+
+# Inference (Hypothesis testing)
+
+In order to test hypothesis about the model parameters and the entire model we will assume:
+
+$$\epsilon_i \overset{\text{i.i.d.}}{\sim}  N(0,\sigma^2) $$
+
+or equivalently
+
+$$y_i \overset{\text{ind.}}{\sim}  N(\beta_0 + \beta_1 x_i, ~\sigma^2) $$
+
+Therefore
+
+$$\beta_1 \sim N\left(\beta_1, \frac{\sigma^2}{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2} \right)$$
+
+
+$$\beta_0 \sim N \left(\beta_0,\sigma^2 \left[ \frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2} \right] \right)$$
+
+
+
+$$\frac{(n-2)\hat{\sigma}^2}{\sigma^2} \sim \chi^2_{n-2}$$
+
+$$\\[0.1cm]$$
+
+**Note**: Before testing the following hypotheses we must check if the assumptions are met.
+
+$$\\[0.1cm]$$
+
+We can now test the following hypothesis:
+
+$H_0 : \beta_1 = 0 \\ H_1 : \beta_1 \neq 0$
+
+or
+
+$H_0 : \beta_0 = 0 \\ H_1 : \beta_0 \neq 0$
+
+
+$$\\[0.05cm]$$
+
+**Example for testing hypothesis about $\beta_1$**
+
+$$\\[0.05cm]$$
+
+(i) **p-value Approach**
+
+
+$H_0 : \beta_1 = 0 \\ H_1 : \beta_1 \neq 0$
+
+We can build the following statistic
+
+$$t^*=\frac{\hat{\beta}_1}{\hat{\sigma}/ \sqrt{ \sum_{i=1}^n \left( x_i - \bar{x} \right)^2 }} = \frac{\hat{\beta}_1}{se(\hat{\beta}_1)}$$
+
+Under $H_0$, $t^* \sim t(n-2)$
+
+
+Use $t^*$ to obtain the probability of observing a value equal or greater than $t^*$ under $H_0$, i.e. $P(t > t^*_{\alpha/2,n-2}|H_0~is~true)$, 
+
+Based on this probability we obtain the *p-value* for our two-sided test, i.e. $p-value = 2P(t > t^*_{\alpha/2,n-2}|H_0~is~true)$.
+
+Decision rule: reject $H_0$ if $p-value < \alpha$.
+
+
+
+$$\\[0.01cm]$$
+
+(ii) **Confidence Interval Approach**
+
+A $(1-\alpha)100 \%$ confidence interval for $\beta_1$ is 
+
+$$\hat{\beta}_1 \pm t_{\alpha/2,n-2}~se(\hat{\beta}_1)$$
+
+Equivalently
+
+$$P\left( \hat{\beta}_1 - t_{\alpha/2,n-2}~se(\hat{\beta}_1) < \beta_1 < \hat{\beta}_1 + t_{\alpha/2,n-2}~se(\hat{\beta}_1) \right) = 1-\alpha$$
+
+
+Reject $H_0$ if the confidence interval do not include 0.
+
+*How to interpret confidence intervals?*
+
+
+$$\\[0.05cm]$$
+
+
+# ANOVA of the Simple Linear Rgression Model
+
+$$SS~Total = SS~Regression + SS~Error$$
+
+or
+
+$$\sum_{i=1}^n \left( y_i - \bar{y} \right)^2 = \sum_{i=1}^n \left(\hat{y}_i -  \bar{y} \right)^2 + \sum_{i=1}^n \left(y_i -  \hat{y}_i \right)^2$$
+
+$$\\[0.01cm]$$
+
+**ANOVA Approach to Regression Analysis**
+
+| Source |  SS | df | MS | $F^*$  |
+| ------- |------ | ------ |------ | ------ |
+| Regression |SSR | 1 | MSR | MSR/MSE | 
+| Error | SSE | n-2 | MSE |  | 
+| Total | SSTot | n-1 | |  | 
+
+$$\\[0.01cm]$$
+
+$F^* \sim F(1,n-2)$
+
+
+$$\\[0.01cm]$$
+
+
+**Testing Hypothesis**
+
+F-test
+
+$H_0: y_i = \beta_0 + \epsilon_i \\ H_1: y_i = \beta_0 + \beta_1 x_i + \epsilon_i$
+
+or equivalently
+
+$H_0: \beta_1 = 0 \\ H_1: \beta_1 \neq 0$
+

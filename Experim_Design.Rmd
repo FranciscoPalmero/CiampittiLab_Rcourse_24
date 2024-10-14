@@ -134,7 +134,7 @@ $$SS~Total = SS~Treatment + SS~Error$$
 
 or
 
-$$\sum_{i=1}^r \sum_{j=1}^t \left( y_{ij} - \bar{y}_{..}\right) = \sum_{j=1}^t \left( \bar{y}_{.j} -  \bar{y}_{..}\right)^2 + \sum_{i=1}^r \sum_{j=1}^t \left( \bar{y}_{ij} -  \bar{y}_{.j}\right)^2$$
+$$\sum_{i=1}^r \sum_{j=1}^t \left( y_{ij} - \bar{y}_{..}\right)^2 = \sum_{j=1}^t \left( \bar{y}_{.j} -  \bar{y}_{..}\right)^2 + \sum_{i=1}^r \sum_{j=1}^t \left( \bar{y}_{ij} -  \bar{y}_{.j}\right)^2$$
 
 
 $$\\[0.3cm]$$
