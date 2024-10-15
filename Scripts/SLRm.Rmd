@@ -10,10 +10,11 @@ library("tidyverse")
 # 1) MODEL 1
 
 # 1.1) Reading the dataset for RUE experiment
-5 sowing dates by 1 hybrid = 5 treatments by 3 replicates in two seasons (2022 and 2023)
+5 sowing dates by 1 hybrid = 5 treatments by 3 repetitions in two seasons (2022 and 2023)
 ```{r}
-df1 <- read.csv("../CiampittiLab_Rcourse_24/Data/RUE.csv") %>% 
+df1 <- read.csv("../Data/RUE.csv") %>% 
   mutate(across(season,as.character))
+
 ```
 
 # 1.2) Exploring the data
@@ -35,7 +36,7 @@ df1 %>%
   theme_bw()
 ```
 
-We can ssume $$y_i = \beta_0 + \beta_1 x_i + \epsilon_i$$
+We can assume $$y_i = \beta_0 + \beta_1 x_i + \epsilon_i$$
 
 # 1.3) Getting the least squares estimators
 
@@ -62,7 +63,7 @@ sig2_hat
 ```
 
 
-Getting the sandard error for $\hat{\beta}_0$ and $\hat{\beta}_1$
+Getting the standard error for $\hat{\beta}_0$ and $\hat{\beta}_1$
 ```{r}
 # se(\beta_1)
 var_b1hat = sig2_hat/sum((df1$iPAR_mj.m2-mean(df1$iPAR_mj.m2))^2)
@@ -242,6 +243,7 @@ df_fit <- tibble(x=seq(min(df1$iPAR_mj.m2),
              max(df1$iPAR_mj.m2),0.1),
        y = lin_model$coefficients[1]+lin_model$coefficients[2]*x)
 
+
 df1 %>% 
   ggplot() +
   geom_point(aes(iPAR_mj.m2,DW_g.m2,
@@ -301,9 +303,17 @@ $$y_i \overset{\text{ind.}}{\sim}  N(\beta_0+\beta_1x_i+\beta_2 x_i^2, ~\sigma^2
 
 
 ```{r}
+lin_mod <- lm(GY_kg.ha~Nrate_kg.ha, data = df2)
 quad_mod <- lm(GY_kg.ha~Nrate_kg.ha+I(Nrate_kg.ha^2), data = df2)
 
 summary(quad_mod)
+
+anova(lin_mod,quad_mod)
+
+```
+
+```{r}
+contrasts()
 ```
 
 
@@ -341,7 +351,7 @@ plot(fitted(quad_mod),rstandard(quad_mod));abline(0,0)
 # 2.5) Plot the Fitted Model
 ```{r}
 df_fit <- tibble(x=seq(min(df2$Nrate_kg.ha),
-             max(df2$Nrate_kg.ha),0.1),
+             max(df2$Nrate_kg.ha),10),
        y = quad_mod$coefficients[1]+quad_mod$coefficients[2]*x+quad_mod$coefficients[3]*(x^2))
 
 
