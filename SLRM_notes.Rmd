@@ -132,10 +132,10 @@ $$y_i \overset{\text{ind.}}{\sim}  N(\beta_0 + \beta_1 x_i, ~\sigma^2) $$
 
 Therefore
 
-$$\beta_1 \sim N\left(\beta_1, \frac{\sigma^2}{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2} \right)$$
+$$\hat{\beta}_1 \sim N\left(\beta_1, \frac{\sigma^2}{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2} \right)$$
 
 
-$$\beta_0 \sim N \left(\beta_0,\sigma^2 \left[ \frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2} \right] \right)$$
+$$\hat{\beta}_0 \sim N \left(\beta_0,\sigma^2 \left[ \frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2} \right] \right)$$
 
 
 
