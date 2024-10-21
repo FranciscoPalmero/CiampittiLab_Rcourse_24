@@ -76,9 +76,9 @@ $$\\[0.1cm]$$
 
 **Assumptions**
 
-(i) $E[\epsilon_i] = 0$ or equivalently $E[y_i] = \mu_i$, for all $i=1,2,...,t$.
+(i) $E[\epsilon_{ij}] = 0$ or equivalently $E[y_i] = \mu_i$, for all $i=1,2,...,t$.
 
-(ii) $var(\epsilon_i) = \sigma^2$ or equivalently $var(y_i) = \sigma^2$, for all $i=1,2,...,t$.
+(ii) $var(\epsilon_{ij}) = \sigma^2$ or equivalently $var(y_i) = \sigma^2$, for all $i=1,2,...,t$.
 
 (iii) $cov(\epsilon_{ij}, \epsilon_{kp})=0$ or equivalently $cov(y_{ij}, y_{kp})=0$, for $i \neq k$ and $j \neq p$.
 

@@ -308,7 +308,7 @@ quad_mod <- lm(GY_kg.ha~Nrate_kg.ha+I(Nrate_kg.ha^2), data = df2)
 
 summary(quad_mod)
 
-anova(lin_mod,quad_mod)
+# anova(lin_mod,quad_mod)
 
 ```
 
@@ -351,7 +351,7 @@ plot(fitted(quad_mod),rstandard(quad_mod));abline(0,0)
 # 2.5) Plot the Fitted Model
 ```{r}
 df_fit <- tibble(x=seq(min(df2$Nrate_kg.ha),
-             max(df2$Nrate_kg.ha),10),
+             max(df2$Nrate_kg.ha),1),
        y = quad_mod$coefficients[1]+quad_mod$coefficients[2]*x+quad_mod$coefficients[3]*(x^2))
 
 
