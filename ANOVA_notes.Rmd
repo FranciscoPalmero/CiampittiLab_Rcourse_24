@@ -1,0 +1,386 @@
+---
+title: ""
+output: html_document
+---
+
+<style>
+h1 {
+  font-size: 40px;
+}
+h2 {
+  font-size: 35px;
+}
+h3 {
+  font-size: 30px;
+}
+h4 {
+  font-size: 25px;
+}
+</style>
+
+
+
+<style type="text/css">
+   body{
+   font-size: 18pt;
+ }
+</style>
+
+
+```{r echo=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+
+
+## The main objectives in statistics:
+
+- **Estimation** (point and uncertainty)
+
+- **Inference** (hypothesis testing)
+
+- **Prediction**
+
+$$\\[0.3cm]$$
+
+# ANOVA Models
+
+## Estimation: One-way ANOVA Model
+
+### Means or Cell Model
+
+Suppose we study the effect of adding two P rates on wheat yield. We will then have
+
+$$y_1 = \mu_1 + \epsilon_1 \\
+y_2 = \mu_2 + \epsilon_2 \\
+y_3 = \mu_3 + \epsilon_3$$
+
+
+We can write these equations in a single model as
+
+$$y_{ij} = \mu_i + \epsilon_{ij}$$
+
+$y_{ij}$ is the jth observation of the ith treatment 
+
+$\mu_i$ is the mean of the ith treatment
+
+$\epsilon_{ij}$ is the residual error associated to the jth observation of the ith treatment
+
+
+$$\\[0.1cm]$$
+
+We will use the **least-square estimation** (LSE) procedure to estimate the parameters in $y_{ij} = \mu_i + \epsilon_{ij}$.
+
+
+$$\\[0.1cm]$$
+
+**Assumptions**
+
+(i) $E[\epsilon_i] = 0$ or equivalently $E[y_i] = \mu_i$, for all $i=1,2,...,t$.
+
+(ii) $var(\epsilon_i) = \sigma^2$ or equivalently $var(y_i) = \sigma^2$, for all $i=1,2,...,t$.
+
+(iii) $cov(\epsilon_{ij}, \epsilon_{kp})=0$ or equivalently $cov(y_{ij}, y_{kp})=0$, for $i \neq k$ and $j \neq p$.
+
+
+$$\\[0.1cm]$$
+
+
+**Estimation**
+
+We want to minimize 
+
+$$Q = \sum_{i=1}^t \sum_{j=1}^{n_i} \left( y_{ij} - \bar{y}_i \right) ^2$$
+
+
+$$Q = \sum_{j=1}^{n_i} \left( y_{1j} - \mu_1 \right)^2 + \sum_{j=1}^{n_i} \left( y_{2j} - \mu_2 \right)^2 + ... + \sum_{j=1}^{n_i} \left( y_{tj} - \mu_t \right)^2$$
+
+Since each of the parameters appears in only one of the components in the sum, the function $Q$ can be minimized by minimizing each component separately.
+
+It is well know that the sample mean minimizes a sum of squared deviations. Therefore, after obtaining the partial derivatives, equating them to zero, and solving for $\mu_i$
+
+$$\hat{\mu}_i = \bar{y}_i = \frac{\sum_{j=1}^{n_i} y_{ij}}{n_i}$$
+
+
+*Residuals*
+
+$$\hat{\sigma}^2 = MSE = \frac{SSE}{df} = \frac{\sum_{i=1}^t \sum_{j=1}^{n_i} \left( y_{ij} - \bar{y}_{i.} \right) ^2}{n-t}$$
+
+
+$$\\[0.1cm]$$
+
+
+
+### Effects Model
+
+The previous ANOVA model can be also written as
+
+$$y_{ij} = \mu + \tau_i + \epsilon_{ij}$$
+
+$y_{ij}$ is the jth observation of the ith treatment 
+
+$\mu$ is some fixed constant that is defined to depending on the purpose of the study
+
+$tau_i$ is the effect of the ith treatment as deviations from $\mu$
+
+$\epsilon_{ij}$ is the residual error associated to the jth observation of the ith treatment
+
+
+
+There different ways of defining $\mu$. Usually, we define $\mu$ as the overall mean of the response variable:
+
+$$\mu = \frac{\sum_{i=1}^t \mu_i}{t}$$
+
+
+If we do so, then we are adding a restriction over the $\tau_i's$. Since $\tau_i = \mu_i - \mu$, then $\sum_{i=1} ^t \tau_i = 0$.
+
+
+$$\\[0.1cm]$$
+
+
+**Estimation**
+
+If we estimate $\mu$ as the overall mean 
+
+$$\hat{\mu} = \frac{\sum_{i=1}^t \hat{\mu}_i}{t} = \frac{\sum_{i=1}^t \sum_{j=1}^{n} y_{ij}}{n}$$
+
+Then, we know that $\tau_i = \mu_i - \mu$. So
+
+$$ \hat{\tau}_i = \hat{\mu}_i - \hat{\mu} = \frac{\sum_{j=1}^{n_i} y_{ij}}{n_i} - \hat{\mu}$$
+
+
+We use the property that, if $X_1, ...,X_n$ are random samples from a  population with mean $\mu$ and variance $\sigma^2 < \infty$, then 
+
+$$E[\bar{X}] = \mu \\
+var[\bar{X}] = \frac{\sigma^2}{n} \\
+E[S^2] = \sigma^2$$
+
+
+
+$$\\[0.1cm]$$
+
+### Inference
+
+In order to test hypothesis about the model parameters and the entire model we will assume:
+
+$$\epsilon_i \overset{\text{i.i.d.}}{\sim}  N(0,\sigma^2) $$
+
+or equivalently
+
+$$y_{ij} \overset{\text{ind.}}{\sim}  N(\mu_i, ~\sigma^2) $$
+
+or equivalently
+
+$$y_{ij} \overset{\text{ind.}}{\sim}  N(\mu+\tau_i, ~\sigma^2) $$
+
+
+Therefore
+
+$$\hat{\mu}_i \sim  N(\mu_i, \sigma^2/n_i)$$
+
+$$\hat{\mu} \sim  N(\mu, \sigma^2/n)$$
+
+$$\hat{\tau}_i \sim  N(\tau_i, \sigma^2/n_i)$$
+
+$$\frac{(n-t) \hat{\sigma}^2}{\sigma^2} \sim \chi^2_{n-t}$$
+
+
+We can now test the following hypothesis:
+
+$H_0 : \mu_i = 0 \\ H_1 : \mu_i \neq 0$
+
+or
+
+$H_0 : \mu = 0 \\ H_1 : \mu \neq 0$
+
+or
+
+$H_0 : \tau_i = 0 \\ H_1 : \tau_i \neq 0$
+
+
+$$\\[0.1cm]$$
+
+
+**Example for testing hypothesis about $\tau_i$**
+
+
+-> **p-value approach**
+
+
+$H_0 : \tau_i = 0 \\ H_1 : \tau_i \neq 0$
+
+Compute a t statistic as
+
+$$t^* = \frac{\hat{\tau}_i}{\sqrt{\sigma^2/n_i}} = \frac{\hat{\tau}_i}{\hat{\sigma}/\sqrt{n_i}} = \frac{\hat{\tau}_i}{se(\hat{\tau}_i)}$$
+
+
+Under $H_0$, $t^* \sim t(n-t)$
+
+
+Use $t^*$ to obtain the probability of observing a value equal or greater than $t^*$ under $H_0$, i.e. $P(t > t^*_{\alpha/2,n-t}|H_0~is~true)$, 
+
+Based on this probability we obtain the *p-value* for our two-sided test, i.e. $p-value = 2P(t > t^*_{\alpha/2,n-t}|H_0~is~true)$.
+
+Decision rule: reject $H_0$ if $p-value < \alpha$.
+
+
+
+$$\\[0.3cm]$$
+
+
+# ANOVA: Sources of errors
+
+$$\\[0.01cm]$$
+
+**Hypothesis**
+
+Full model -> $y_{ij} = \mu_j + \epsilon_{ij}$
+
+Reduced model -> $y_{ij} = \mu + \epsilon_{ij}$
+
+
+$$\\[0.01cm]$$
+
+Based on these models, we partition the total sum of squares to identify the main **sources of variation** in our experiment, i.e. **is the variability due to treatments or is the variability just random?** 
+
+$$SS~Total = SS~Treatment + SS~Error$$
+
+or
+
+$$\sum_{i=1}^t \sum_{j=1}^{n_i} \left( y_{ij} - \mu\right)^2 = \sum_{i=1}^t \left( \mu_i - \mu \right)^2 + \sum_{i=1}^t \sum_{j=1}^{n_i} \left(y_{ij} -  \mu_i \right)^2$$
+
+
+$$\\[0.01cm]$$
+
+We will partition the total sum of squares using our estimations. Then
+
+
+$$\sum_{i=1}^t \sum_{j=1}^{n_i} \left( y_{ij} - \hat{\mu}\right)^2 = \sum_{i=1}^t \left( \hat{\mu}_i - \hat{\mu} \right)^2 + \sum_{i=1}^t \sum_{j=1}^{n_i} \left(y_{ij} -  \hat{\mu}_i \right)^2$$
+
+
+$$\\[0.01cm]$$
+
+## ANOVA Table For a CRD with One Factor
+```{r error=FALSE,message=FALSE,warning=FALSE,echo=FALSE}
+
+TABLE1 <- tribble(
+  ~"", ~"Sum of Squares", ~"df", ~"Mean Squares", ~"F*",
+  "Treatment", "SST", "t-1", "MST", "MST/MSE",
+  "Error", "SSE", "n-t", "MSE", "",
+  "Total", "SSTot", "n-1", "", ""
+  
+)
+
+knitr::kable((TABLE1), booktabs = TRUE)
+```
+
+Where:
+
+
+$$SST = n_i \sum_{i=1}^t \left( \hat{\mu}_i - \hat{\mu} \right)^2$$
+
+
+$$SSE = \sum_{i=1}^t \sum_{j=1}^{n_i} \left(y_{ij} -  \hat{\mu}_i \right)^2$$
+
+The $MSE = \frac{SSE}{df} = \frac{SSE}{n-t}$ is an unbiased estimator if $\sigma^2_{\epsilon}$.
+
+
+$$SSTot = \sum_{i=1}^t \sum_{j=1}^{n_i} \left( y_{ij} - \hat{\mu}\right)^2$$
+
+
+$\frac{SSTot}{n-1}=Sample~variance~of~y$
+
+
+$SSTot = SST+SSE$.
+
+
+$$\\[0.01cm]$$
+
+We use the F statistic to test $H_0: \mu_1 = \mu_2 = ... = \mu_t$ vs $H_1: Not~H_0$
+
+Under $H_0$
+
+$$F^* \sim F_{(t-1, n-t)}$$
+
+Compute $p-value = P(F > F^*_{t-1,n-t}|H_0~is~true)$
+
+Decision rule: reject $H_0$ if $p-value < \alpha$.
+
+
+
+$$\\[0.3cm]$$
+
+# Multiple Comparison Tests (a *posteriori* tests)
+
+Usually we want to compare two treatments or factor levels. 
+
+
+$$H_0: \mu_i - \mu_{i'} = 0 \\
+H_1: \mu_i - \mu_{i'} \neq 0 \\$$
+
+
+
+We can make these comparisons by computing the difference between the two factor levels, e.g. $\mu_i$ and $\mu_{i'}$.  
+
+$$D = \mu_i - \mu_{i'}$$
+
+This difference $D$ is called *pairwise comparison*. 
+
+
+A point estimator for $D$ is 
+
+$$\hat{D} = \hat{\mu}_i-\hat{\mu}_{i'}$$
+
+
+Since $\mu_i$ and $\mu_{i'}$ are independent, the variance of $\hat{D}$
+
+$$var({\hat{D}}) = \sigma^2 \mu_i + \sigma^2 \mu_{i'} = \sigma^2 \left( \frac{1}{n_i} + \frac{1}{n_{i'}} \right)$$
+
+
+Assuming homogeneous variance over the $y's$, the estimated variance of $\hat{D}$ is 
+
+$$s^2(\hat{D}) = MSE \left( \frac{1}{n_i} + \frac{1}{n_{i'}} \right)$$
+
+
+### Multicomparisons t-test
+
+Finally, since $\hat{D}$ is normally distributed, under $H_0$ true
+
+$$\frac{\hat{D}}{s^2(\hat{D})} \sim t_{(n-t)}$$
+
+
+Then we can compute p-values and confidence intervals for the difference between the two means.
+
+Confidence interval: 
+
+$$\hat{\mu}_i-\hat{\mu}_{i'} ~ \pm ~ \left(t_{1-\alpha/2, n-t}\right) ~ S_p \sqrt{\frac{1}{n_i} + \frac{1}{n_{i'}}}$$
+
+
+where $S_p = \sqrt{\frac{(n_i-1)S^2_i+(n_{i'}-1)S^2_{i'}}{n_i+n_{i'}-2}}$.
+
+
+If we replace $sp$ by $MSE$, then 
+
+$$\hat{\mu}_i-\hat{\mu}_{i'} ~ \pm ~ \left(t_{1-\alpha/2, n-t}\right) ~ MSE \sqrt{\frac{1}{n_i} + \frac{1}{n_{i'}}}$$
+
+Since we are considering $MSE$, this test is equivalent to *Fisher's LSD test*.
+
+
+
+### Tukey's HSD 
+
+We can build the $q^*$ statistic as
+
+
+$$ q = \frac{\hat{\mu}_i-\hat{\mu}_{i'}}{\sqrt{\frac{1}{2} MSE \left(\frac{1}{n_i} + \frac{1}{n_{i'}} \right)}}$$
+
+Under $H_0$ true
+
+$$q \sim f(q)_{t,n-t}$$
+
+We can also build a confidence interval as
+
+$$\hat{\mu}_i-\hat{\mu}_{i'} ~ \pm ~ \left(q_{1-\alpha/\sqrt{2}, n-t}\right) ~ \sqrt{MSE \left( \frac{1}{n_i} + \frac{1}{n_{i'}} \right)}$$
+
+
+

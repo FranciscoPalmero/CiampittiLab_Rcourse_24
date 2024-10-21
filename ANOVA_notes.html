@@ -11,7 +11,7 @@
 
 
 
-<title>SLRM_notes.knit</title>
+<title>ANOVA_notes.knit</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -380,208 +380,294 @@ font-size: 18pt;
 </ul>
 <p><span class="math display">\[\\[0.3cm]\]</span></p>
 </div>
-<div id="simple-linear-regression-model" class="section level1">
-<h1>Simple Linear Regression Model</h1>
-<p>The simple linear regression model for n observations is</p>
-<p><span class="math display">\[y_i = \beta_0 + \beta_1x_i +
-\epsilon_i,\]</span></p>
-<p><span class="math display">\[for ~ i=1,2,...,n\]</span></p>
-<p>The <span class="math inline">\(y_i&#39;s\)</span> and <span class="math inline">\(\epsilon_i&#39;s\)</span> are <strong>random
-variables</strong>, while the <span class="math inline">\(x_i&#39;s\)</span> are known constants.</p>
-<p><span class="math display">\[\\[0.1cm]\]</span> <strong>Identifying
-linear models</strong></p>
-<p><span class="math inline">\(y_i = \beta_0+\beta_1 x_{i1} + \beta_2
-x_{i2} + ... + \beta_k x_{ik} + \epsilon_{i}\)</span></p>
-<p><span class="math inline">\(y_i = \beta_0 + \beta_1 x_i + \beta_2
-x_i^2 + \epsilon_{i}\)</span></p>
-<p><span class="math inline">\(y_i = \beta_0+ e^{\beta_1 x_i} +
-\epsilon_{i}\)</span></p>
-<p><span class="math inline">\(y_i = \beta_0+ e^{x_i} +
-\epsilon_{i}\)</span></p>
-<p><span class="math display">\[\\[0.3cm]\]</span></p>
-</div>
-<div id="estimation" class="section level1">
-<h1>Estimation</h1>
+<div id="anova-models" class="section level1">
+<h1>ANOVA Models</h1>
+<div id="estimation-one-way-anova-model" class="section level2">
+<h2>Estimation: One-way ANOVA Model</h2>
+<div id="means-or-cell-model" class="section level3">
+<h3>Means or Cell Model</h3>
+<p>Suppose we study the effect of adding two P rates on wheat yield. We
+will then have</p>
+<p><span class="math display">\[y_1 = \mu_1 + \epsilon_1 \\
+y_2 = \mu_2 + \epsilon_2 \\
+y_3 = \mu_3 + \epsilon_3\]</span></p>
+<p>We can write these equations in a single model as</p>
+<p><span class="math display">\[y_{ij} = \mu_i +
+\epsilon_{ij}\]</span></p>
+<p><span class="math inline">\(y_{ij}\)</span> is the jth observation of
+the ith treatment</p>
+<p><span class="math inline">\(\mu_i\)</span> is the mean of the ith
+treatment</p>
+<p><span class="math inline">\(\epsilon_{ij}\)</span> is the residual
+error associated to the jth observation of the ith treatment</p>
+<p><span class="math display">\[\\[0.1cm]\]</span></p>
 <p>We will use the <strong>least-square estimation</strong> (LSE)
-procedure to estimate the parameters in <span class="math inline">\(y_i
-= \beta_0 + \beta_1 x_i + \epsilon_i\)</span>.</p>
-<p>For obtaining good properties of the LSE we will assume for this
-simple linear regression model that:</p>
+procedure to estimate the parameters in <span class="math inline">\(y_{ij} = \mu_i + \epsilon_{ij}\)</span>.</p>
+<p><span class="math display">\[\\[0.1cm]\]</span></p>
+<p><strong>Assumptions</strong></p>
 <ol style="list-style-type: lower-roman">
 <li><p><span class="math inline">\(E[\epsilon_i] = 0\)</span> or
-equivalently <span class="math inline">\(E[y_i] = \beta_0 + \beta_1
-x_i\)</span>, for all <span class="math inline">\(i=1,2,...,n\)</span>.</p></li>
+equivalently <span class="math inline">\(E[y_i] = \mu_i\)</span>, for
+all <span class="math inline">\(i=1,2,...,t\)</span>.</p></li>
 <li><p><span class="math inline">\(var(\epsilon_i) = \sigma^2\)</span>
 or equivalently <span class="math inline">\(var(y_i) =
-\sigma^2\)</span>, for all <span class="math inline">\(i=1,2,...,n\)</span>.</p></li>
-<li><p><span class="math inline">\(cov(\epsilon_i,
-\epsilon_j)=0\)</span> or equivalently <span class="math inline">\(cov(y_i, y_j)=0\)</span>, for <span class="math inline">\(i \neq j\)</span>.</p></li>
+\sigma^2\)</span>, for all <span class="math inline">\(i=1,2,...,t\)</span>.</p></li>
+<li><p><span class="math inline">\(cov(\epsilon_{ij},
+\epsilon_{kp})=0\)</span> or equivalently <span class="math inline">\(cov(y_{ij}, y_{kp})=0\)</span>, for <span class="math inline">\(i \neq k\)</span> and <span class="math inline">\(j \neq p\)</span>.</p></li>
 </ol>
 <p><span class="math display">\[\\[0.1cm]\]</span></p>
-<p><em>Note</em>: The LSE does <strong>not</strong> need any
-<strong>distributional assumption</strong> in order to get good
-properties.</p>
-<p>In the least-squares approach we seek for <span class="math inline">\(\hat{\beta_0}\)</span> and <span class="math inline">\(\hat{\beta_1}\)</span> such that the sum of
-squares of the deviations <span class="math inline">\(y_i-\hat{y_i}\)</span> of the <span class="math inline">\(n\)</span> observed <span class="math inline">\(y_i&#39;s\)</span> is minimized. If <span class="math inline">\(\hat{\epsilon}_i = y_i-\hat{y}_i\)</span>, then
-the LSE can be written as:</p>
-<p><span class="math display">\[\sum_{i=n}^n \hat{\epsilon}_i^2 =
-\sum_{i=n}^n \left( y_i-\hat{y}_i \right)^2 = \sum_{i=n}^n \left(
-y_i-\hat{\beta_0}-\hat{\beta_1} x_i \right)^2\]</span></p>
-<p><em>Note</em>: be aware that <span class="math inline">\(\hat{y}_i\)</span> estimates <span class="math inline">\(E[y_i]\)</span>, not <span class="math inline">\(y_i\)</span>.</p>
-<p>To find the values of <span class="math inline">\(\hat{\beta_0}\)</span> and <span class="math inline">\(\hat{\beta_1}\)</span> that minimize <span class="math inline">\(\sum_{i=n}^n \hat{\epsilon}_i^2\)</span>, we
-differentiate <span class="math inline">\(\sum_{i=n}^n
-\hat{\epsilon}_i^2\)</span> with respect to <span class="math inline">\(\hat{\beta_0}\)</span> and <span class="math inline">\(\hat{\beta_1}\)</span>, set the results equal to
-zero, and solve for <span class="math inline">\(\hat{\beta_0}\)</span>
-and <span class="math inline">\(\hat{\beta_1}\)</span>. After doing
-so,</p>
-<p><span class="math display">\[\hat{\beta_1} = \frac{\sum_{i=1}^n
-\left( x_i - \bar{x} \right) \left( y_i - \bar{y} \right) }{\sum_{i=1}^n
-\left( x_i - \bar{x} \right)^2 }\]</span></p>
-<p><span class="math display">\[\hat{\beta_0} =
-\bar{y}-\hat{\beta_1}\bar{x}\]</span></p>
-<p>If the previous assumptions are met, then:</p>
-<p><span class="math display">\[E[\hat{\beta}_1] = \beta_1\]</span></p>
-<p><span class="math display">\[E[\hat{\beta}_0] = \beta_0\]</span></p>
-<p><span class="math display">\[var(\hat{\beta}_1) =
-\frac{\sigma^2}{\sum_{i=1}^n \left( x_i - \bar{x}
-\right)^2}\]</span></p>
-<p><span class="math display">\[var(\hat{\beta}_0) = \sigma^2 \left[
-\frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^n \left( x_i - \bar{x}
-\right)^2} \right]\]</span></p>
-<p><span class="math display">\[\\[0.2cm]\]</span></p>
-<p><strong>What about <span class="math inline">\(\sigma^2\)</span>?</strong></p>
-<p>Minimizing <span class="math inline">\(\sum_{i=n}^n
-\hat{\epsilon}_i^2\)</span> does not provide an estimate of <span class="math inline">\(var(y_i)=\sigma^2\)</span>. However, by the
-definition of the variance and assumption (i), we have:</p>
-<p><span class="math display">\[\hat{\sigma}^2 = \frac{\sum_{i=n}^n
-\left( y_i-\hat{y}_i \right)^2}{n-2} = \frac{\sum_{i=n}^n \left(
-y_i-\hat{\beta_0}-\hat{\beta_1} x_i \right)^2}{n-2}\]</span></p>
-<p>We can also prove that <span class="math inline">\(E[\hat{\sigma}^2]=
-\sigma^2\)</span>.</p>
-<p><span class="math display">\[\\[0.3cm]\]</span></p>
+<p><strong>Estimation</strong></p>
+<p>We want to minimize</p>
+<p><span class="math display">\[Q = \sum_{i=1}^t \sum_{j=1}^{n_i} \left(
+y_{ij} - \bar{y}_i \right) ^2\]</span></p>
+<p><span class="math display">\[Q = \sum_{j=1}^{n_i} \left( y_{1j} -
+\mu_1 \right)^2 + \sum_{j=1}^{n_i} \left( y_{2j} - \mu_2 \right)^2 + ...
++ \sum_{j=1}^{n_i} \left( y_{tj} - \mu_t \right)^2\]</span></p>
+<p>Since each of the parameters appears in only one of the components in
+the sum, the function <span class="math inline">\(Q\)</span> can be
+minimized by minimizing each component separately.</p>
+<p>It is well know that the sample mean minimizes a sum of squared
+deviations. Therefore, after obtaining the partial derivatives, equating
+them to zero, and solving for <span class="math inline">\(\mu_i\)</span></p>
+<p><span class="math display">\[\hat{\mu}_i = \bar{y}_i =
+\frac{\sum_{j=1}^{n_i} y_{ij}}{n_i}\]</span></p>
+<p><em>Residuals</em></p>
+<p><span class="math display">\[\hat{\sigma}^2 = MSE = \frac{SSE}{df} =
+\frac{\sum_{i=1}^t \sum_{j=1}^{n_i} \left( y_{ij} - \bar{y}_{i.} \right)
+^2}{n-t}\]</span></p>
+<p><span class="math display">\[\\[0.1cm]\]</span></p>
 </div>
-<div id="inference-hypothesis-testing" class="section level1">
-<h1>Inference (Hypothesis testing)</h1>
+<div id="effects-model" class="section level3">
+<h3>Effects Model</h3>
+<p>The previous ANOVA model can be also written as</p>
+<p><span class="math display">\[y_{ij} = \mu + \tau_i +
+\epsilon_{ij}\]</span></p>
+<p><span class="math inline">\(y_{ij}\)</span> is the jth observation of
+the ith treatment</p>
+<p><span class="math inline">\(\mu\)</span> is some fixed constant that
+is defined to depending on the pourpouse of the study</p>
+<p><span class="math inline">\(tau_i\)</span> is the effect of the ith
+treatment as deviations from <span class="math inline">\(\mu\)</span></p>
+<p><span class="math inline">\(\epsilon_{ij}\)</span> is the residual
+error associated to the jth observation of the ith treatment</p>
+<p>There different ways of defining <span class="math inline">\(\mu\)</span>. Usually, we define <span class="math inline">\(\mu\)</span> as the overall mean of the response
+variable:</p>
+<p><span class="math display">\[\mu = \frac{\sum_{i=1}^t
+\mu_i}{t}\]</span></p>
+<p>If we do so, then we are adding a restriction over the <span class="math inline">\(\tau_i&#39;s\)</span>. Since <span class="math inline">\(\tau_i = \mu_i - \mu\)</span>, then <span class="math inline">\(\sum_{i=1} ^t \tau_i = 0\)</span>.</p>
+<p><span class="math display">\[\\[0.1cm]\]</span></p>
+<p><strong>Estimation</strong></p>
+<p>If we estimate <span class="math inline">\(\mu\)</span> as the
+overall mean</p>
+<p><span class="math display">\[\hat{\mu} = \frac{\sum_{i=1}^t
+\hat{\mu}_i}{t} = \frac{\sum_{i=1}^t \sum_{j=1}^{n}
+y_{ij}}{n}\]</span></p>
+<p>Then, we know that <span class="math inline">\(\tau_i = \mu_i -
+\mu\)</span>. So</p>
+<p><span class="math display">\[ \hat{\tau}_i = \hat{\mu}_i - \hat{\mu}
+= \frac{\sum_{j=1}^{n_i} y_{ij}}{n_i} - \hat{\mu}\]</span></p>
+<p>We use the property that, if <span class="math inline">\(X_1,
+...,X_n\)</span> are random samples from a population with mean <span class="math inline">\(\mu\)</span> and variance <span class="math inline">\(\sigma^2 &lt; \infty\)</span>, then</p>
+<p><span class="math display">\[E[\bar{X}] = \mu \\
+var[\bar{X}] = \frac{\sigma^2}{n} \\
+E[S^2] = \sigma^2\]</span></p>
+<p><span class="math display">\[\\[0.1cm]\]</span></p>
+</div>
+<div id="inference" class="section level3">
+<h3>Inference</h3>
 <p>In order to test hypothesis about the model parameters and the entire
 model we will assume:</p>
 <p><span class="math display">\[\epsilon_i
 \overset{\text{i.i.d.}}{\sim}  N(0,\sigma^2) \]</span></p>
 <p>or equivalently</p>
-<p><span class="math display">\[y_i
-\overset{\text{ind.}}{\sim}  N(\beta_0 + \beta_1 x_i, ~\sigma^2)
-\]</span></p>
+<p><span class="math display">\[y_{ij}
+\overset{\text{ind.}}{\sim}  N(\mu_i, ~\sigma^2) \]</span></p>
+<p>or equivalently</p>
+<p><span class="math display">\[y_{ij}
+\overset{\text{ind.}}{\sim}  N(\mu+\tau_i, ~\sigma^2) \]</span></p>
 <p>Therefore</p>
-<p><span class="math display">\[\hat{\beta}_1 \sim N\left(\beta_1,
-\frac{\sigma^2}{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2}
-\right)\]</span></p>
-<p><span class="math display">\[\hat{\beta}_0 \sim N
-\left(\beta_0,\sigma^2 \left[ \frac{1}{n} +
-\frac{\bar{x}^2}{\sum_{i=1}^n \left( x_i - \bar{x} \right)^2} \right]
-\right)\]</span></p>
-<p><span class="math display">\[\frac{(n-2)\hat{\sigma}^2}{\sigma^2}
-\sim \chi^2_{n-2}\]</span></p>
-<p><span class="math display">\[\\[0.1cm]\]</span></p>
-<p><strong>Note</strong>: Before testing the following hypotheses we
-must check if the assumptions are met.</p>
-<p><span class="math display">\[\\[0.1cm]\]</span></p>
+<p><span class="math display">\[\hat{\mu}_i \sim  N(\mu_i,
+\sigma^2/n_i)\]</span></p>
+<p><span class="math display">\[\hat{\mu} \sim  N(\mu,
+\sigma^2/n)\]</span></p>
+<p><span class="math display">\[\hat{\tau}_i \sim  N(\tau_i,
+\sigma^2/n_i)\]</span></p>
+<p><span class="math display">\[\frac{(n-t) \hat{\sigma}^2}{\sigma^2}
+\sim \chi^2_{n-t}\]</span></p>
 <p>We can now test the following hypothesis:</p>
-<p><span class="math inline">\(H_0 : \beta_1 = 0 \\ H_1 : \beta_1 \neq
+<p><span class="math inline">\(H_0 : \mu_i = 0 \\ H_1 : \mu_i \neq
 0\)</span></p>
 <p>or</p>
-<p><span class="math inline">\(H_0 : \beta_0 = 0 \\ H_1 : \beta_0 \neq
+<p><span class="math inline">\(H_0 : \mu = 0 \\ H_1 : \mu \neq
 0\)</span></p>
-<p><span class="math display">\[\\[0.05cm]\]</span></p>
-<p><strong>Example for testing hypothesis about <span class="math inline">\(\beta_1\)</span></strong></p>
-<p><span class="math display">\[\\[0.05cm]\]</span></p>
-<ol style="list-style-type: lower-roman">
-<li><strong>p-value Approach</strong></li>
-</ol>
-<p><span class="math inline">\(H_0 : \beta_1 = 0 \\ H_1 : \beta_1 \neq
+<p>or</p>
+<p><span class="math inline">\(H_0 : \tau_i = 0 \\ H_1 : \tau_i \neq
 0\)</span></p>
-<p>We can build the following statistic</p>
-<p><span class="math display">\[t^*=\frac{\hat{\beta}_1}{\hat{\sigma}/
-\sqrt{ \sum_{i=1}^n \left( x_i - \bar{x} \right)^2 }} =
-\frac{\hat{\beta}_1}{se(\hat{\beta}_1)}\]</span></p>
-<p>Under <span class="math inline">\(H_0\)</span>, <span class="math inline">\(t^* \sim t(n-2)\)</span></p>
+<p><span class="math display">\[\\[0.1cm]\]</span></p>
+<p><strong>Example for testing hypothesis about <span class="math inline">\(\tau_i\)</span></strong></p>
+<p>-&gt; <strong>p-value approach</strong></p>
+<p><span class="math inline">\(H_0 : \tau_i = 0 \\ H_1 : \tau_i \neq
+0\)</span></p>
+<p>Compute a t statistic as</p>
+<p><span class="math display">\[t^* =
+\frac{\hat{\tau}_i}{\sqrt{\sigma^2/n_i}} =
+\frac{\hat{\tau}_i}{\hat{\sigma}/\sqrt{n_i}} =
+\frac{\hat{\tau}_i}{se(\hat{\tau}_i)}\]</span></p>
+<p>Under <span class="math inline">\(H_0\)</span>, <span class="math inline">\(t^* \sim t(n-t)\)</span></p>
 <p>Use <span class="math inline">\(t^*\)</span> to obtain the
 probability of observing a value equal or greater than <span class="math inline">\(t^*\)</span> under <span class="math inline">\(H_0\)</span>, i.e. <span class="math inline">\(P(t
-&gt; t^*_{\alpha/2,n-2}|H_0~is~true)\)</span>,</p>
+&gt; t^*_{\alpha/2,n-t}|H_0~is~true)\)</span>,</p>
 <p>Based on this probability we obtain the <em>p-value</em> for our
 two-sided test, i.e. <span class="math inline">\(p-value = 2P(t &gt;
-t^*_{\alpha/2,n-2}|H_0~is~true)\)</span>.</p>
+t^*_{\alpha/2,n-t}|H_0~is~true)\)</span>.</p>
 <p>Decision rule: reject <span class="math inline">\(H_0\)</span> if
 <span class="math inline">\(p-value &lt; \alpha\)</span>.</p>
-<p><span class="math display">\[\\[0.01cm]\]</span></p>
-<ol start="2" style="list-style-type: lower-roman">
-<li><strong>Confidence Interval Approach</strong></li>
-</ol>
-<p>A <span class="math inline">\((1-\alpha)100 \%\)</span> confidence
-interval for <span class="math inline">\(\beta_1\)</span> is</p>
-<p><span class="math display">\[\hat{\beta}_1 \pm
-t_{\alpha/2,n-2}~se(\hat{\beta}_1)\]</span></p>
-<p>Equivalently</p>
-<p><span class="math display">\[P\left( \hat{\beta}_1 -
-t_{\alpha/2,n-2}~se(\hat{\beta}_1) &lt; \beta_1 &lt; \hat{\beta}_1 +
-t_{\alpha/2,n-2}~se(\hat{\beta}_1) \right) = 1-\alpha\]</span></p>
-<p>Reject <span class="math inline">\(H_0\)</span> if the confidence
-interval do not include 0.</p>
-<p><em>How to interpret confidence intervals?</em></p>
-<p><span class="math display">\[\\[0.05cm]\]</span></p>
+<p><span class="math display">\[\\[0.3cm]\]</span></p>
 </div>
-<div id="anova-of-the-simple-linear-rgression-model" class="section level1">
-<h1>ANOVA of the Simple Linear Rgression Model</h1>
-<p><span class="math display">\[SS~Total = SS~Regression +
+</div>
+</div>
+<div id="anova-sources-of-errors" class="section level1">
+<h1>ANOVA: Sources of errors</h1>
+<p><span class="math display">\[\\[0.01cm]\]</span></p>
+<p><strong>Hypothesis</strong></p>
+<p>Full model -&gt; <span class="math inline">\(y_{ij} = \mu_j +
+\epsilon_{ij}\)</span></p>
+<p>Reduced model -&gt; <span class="math inline">\(y_{ij} = \mu +
+\epsilon_{ij}\)</span></p>
+<p><span class="math display">\[\\[0.01cm]\]</span></p>
+<p>Based on these models, we partition the total sum of squares to
+identify the main <strong>sources of variation</strong> in our
+experiment, i.e. <strong>is the variability due to treatments or is the
+variability just random?</strong></p>
+<p><span class="math display">\[SS~Total = SS~Treatment +
 SS~Error\]</span></p>
 <p>or</p>
-<p><span class="math display">\[\sum_{i=1}^n \left( y_i - \bar{y}
-\right)^2 = \sum_{i=1}^n \left(\hat{y}_i -  \bar{y} \right)^2 +
-\sum_{i=1}^n \left(y_i -  \hat{y}_i \right)^2\]</span></p>
+<p><span class="math display">\[\sum_{i=1}^t \sum_{j=1}^{n_i} \left(
+y_{ij} - \mu\right)^2 = \sum_{i=1}^t \left( \mu_i - \mu \right)^2 +
+\sum_{i=1}^t \sum_{j=1}^{n_i} \left(y_{ij} -  \mu_i
+\right)^2\]</span></p>
 <p><span class="math display">\[\\[0.01cm]\]</span></p>
-<p><strong>ANOVA Approach to Regression Analysis</strong></p>
+<p>We will partition the total sum of squares using our estimations.
+Then</p>
+<p><span class="math display">\[\sum_{i=1}^t \sum_{j=1}^{n_i} \left(
+y_{ij} - \hat{\mu}\right)^2 = \sum_{i=1}^t \left( \hat{\mu}_i -
+\hat{\mu} \right)^2 + \sum_{i=1}^t \sum_{j=1}^{n_i} \left(y_{ij}
+-  \hat{\mu}_i \right)^2\]</span></p>
+<p><span class="math display">\[\\[0.01cm]\]</span></p>
+<div id="anova-table-for-a-crd-with-one-factor" class="section level2">
+<h2>ANOVA Table For a CRD with One Factor</h2>
 <table>
 <thead>
 <tr class="header">
-<th>Source</th>
-<th>SS</th>
-<th>df</th>
-<th>MS</th>
-<th><span class="math inline">\(F^*\)</span></th>
+<th align="left"></th>
+<th align="left">Sum of Squares</th>
+<th align="left">df</th>
+<th align="left">Mean Squares</th>
+<th align="left">F*</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Regression</td>
-<td>SSR</td>
-<td>1</td>
-<td>MSR</td>
-<td>MSR/MSE</td>
+<td align="left">Treatment</td>
+<td align="left">SST</td>
+<td align="left">t-1</td>
+<td align="left">MST</td>
+<td align="left">MST/MSE</td>
 </tr>
 <tr class="even">
-<td>Error</td>
-<td>SSE</td>
-<td>n-2</td>
-<td>MSE</td>
-<td></td>
+<td align="left">Error</td>
+<td align="left">SSE</td>
+<td align="left">n-t</td>
+<td align="left">MSE</td>
+<td align="left"></td>
 </tr>
 <tr class="odd">
-<td>Total</td>
-<td>SSTot</td>
-<td>n-1</td>
-<td></td>
-<td></td>
+<td align="left">Total</td>
+<td align="left">SSTot</td>
+<td align="left">n-1</td>
+<td align="left"></td>
+<td align="left"></td>
 </tr>
 </tbody>
 </table>
+<p>Where:</p>
+<p><span class="math display">\[SST = n_i \sum_{i=1}^t \left(
+\hat{\mu}_i - \hat{\mu} \right)^2\]</span></p>
+<p><span class="math display">\[SSE = \sum_{i=1}^t \sum_{j=1}^{n_i}
+\left(y_{ij} -  \hat{\mu}_i \right)^2\]</span></p>
+<p>The <span class="math inline">\(MSE = \frac{SSE}{df} =
+\frac{SSE}{n-t}\)</span> is an unbiased estimator if <span class="math inline">\(\sigma^2_{\epsilon}\)</span>.</p>
+<p><span class="math display">\[SSTot = \sum_{i=1}^t \sum_{j=1}^{n_i}
+\left( y_{ij} - \hat{\mu}\right)^2\]</span></p>
+<p><span class="math inline">\(\frac{SSTot}{n-1}=Sample~variance~of~y\)</span></p>
+<p><span class="math inline">\(SSTot = SST+SSE\)</span>.</p>
 <p><span class="math display">\[\\[0.01cm]\]</span></p>
-<p><span class="math inline">\(F^* \sim F(1,n-2)\)</span></p>
-<p><span class="math display">\[\\[0.01cm]\]</span></p>
-<p><strong>Testing Hypothesis</strong></p>
-<p>F-test</p>
-<p><span class="math inline">\(H_0: y_i = \beta_0 + \epsilon_i \\ H_1:
-y_i = \beta_0 + \beta_1 x_i + \epsilon_i\)</span></p>
-<p>or equivalently</p>
-<p><span class="math inline">\(H_0: \beta_1 = 0 \\ H_1: \beta_1 \neq
-0\)</span></p>
+<p>We use the F statistic to test <span class="math inline">\(H_0: \mu_1
+= \mu_2 = ... = \mu_t\)</span> vs <span class="math inline">\(H_1:
+Not~H_0\)</span></p>
+<p>Under <span class="math inline">\(H_0\)</span></p>
+<p><span class="math display">\[F^* \sim F_{(t-1, n-t)}\]</span></p>
+<p>Compute <span class="math inline">\(p-value = P(F &gt;
+F^*_{t-1,n-t}|H_0~is~true)\)</span></p>
+<p>Decision rule: reject <span class="math inline">\(H_0\)</span> if
+<span class="math inline">\(p-value &lt; \alpha\)</span>.</p>
+<p><span class="math display">\[\\[0.3cm]\]</span></p>
+</div>
+</div>
+<div id="multiple-comparison-tests-a-posteriori-tests" class="section level1">
+<h1>Multiple Comparison Tests (a <em>posteriori</em> tests)</h1>
+<p>Usually we want to compare two treatments or factor levels.</p>
+<p><span class="math display">\[H_0: \mu_i - \mu_{i&#39;} = 0 \\
+H_1: \mu_i - \mu_{i&#39;} \neq 0 \\\]</span></p>
+<p>We can make these comparisons by computing the difference between the
+two factor levels, e.g. <span class="math inline">\(\mu_i\)</span> and
+<span class="math inline">\(\mu_{i&#39;}\)</span>.</p>
+<p><span class="math display">\[D = \mu_i - \mu_{i&#39;}\]</span></p>
+<p>This difference <span class="math inline">\(D\)</span> is called
+<em>pairwise comparison</em>.</p>
+<p>A point estimator for <span class="math inline">\(D\)</span> is</p>
+<p><span class="math display">\[\hat{D} =
+\hat{\mu}_i-\hat{\mu}_{i&#39;}\]</span></p>
+<p>Since <span class="math inline">\(\mu_i\)</span> and <span class="math inline">\(\mu_{i&#39;}\)</span> are independent, the
+variance of <span class="math inline">\(\hat{D}\)</span></p>
+<p><span class="math display">\[var({\hat{D}}) = \sigma^2 \mu_i +
+\sigma^2 \mu_{i&#39;} = \sigma^2 \left( \frac{1}{n_i} +
+\frac{1}{n_{i&#39;}} \right)\]</span></p>
+<p>Assuming homogeneous variance over the <span class="math inline">\(y&#39;s\)</span>, the estimated variance of <span class="math inline">\(\hat{D}\)</span> is</p>
+<p><span class="math display">\[s^2(\hat{D}) = MSE \left( \frac{1}{n_i}
++ \frac{1}{n_{i&#39;}} \right)\]</span></p>
+<div id="multicomparisons-t-test" class="section level3">
+<h3>Multicomparisons t-test</h3>
+<p>Finally, since <span class="math inline">\(\hat{D}\)</span> is
+normally distributed, under <span class="math inline">\(H_0\)</span>
+true</p>
+<p><span class="math display">\[\frac{\hat{D}}{s^2(\hat{D})} \sim
+t_{(n-t)}\]</span></p>
+<p>Then we can compute p-values and confidence intervals for the
+difference between the two means.</p>
+<p>Confidence interval:</p>
+<p><span class="math display">\[\hat{\mu}_i-\hat{\mu}_{i&#39;} ~ \pm ~
+\left(t_{1-\alpha/2, n-t}\right) ~ S_p \sqrt{\frac{1}{n_i} +
+\frac{1}{n_{i&#39;}}}\]</span></p>
+<p>where <span class="math inline">\(S_p =
+\sqrt{\frac{(n_i-1)S^2_i+(n_{i&#39;}-1)S^2_{i&#39;}}{n_i+n_{i&#39;}-2}}\)</span>.</p>
+<p>If we replace <span class="math inline">\(sp\)</span> by <span class="math inline">\(MSE\)</span>, then</p>
+<p><span class="math display">\[\hat{\mu}_i-\hat{\mu}_{i&#39;} ~ \pm ~
+\left(t_{1-\alpha/2, n-t}\right) ~ MSE \sqrt{\frac{1}{n_i} +
+\frac{1}{n_{i&#39;}}}\]</span></p>
+<p>Since we are considering <span class="math inline">\(MSE\)</span>,
+this test is equivalent to <em>Fisher’s LSD test</em>.</p>
+</div>
+<div id="tukeys-hsd" class="section level3">
+<h3>Tukey’s HSD</h3>
+<p>We can build the <span class="math inline">\(q^*\)</span> statistic
+as</p>
+<p><span class="math display">\[ q =
+\frac{\hat{\mu}_i-\hat{\mu}_{i&#39;}}{\sqrt{\frac{1}{2} MSE
+\left(\frac{1}{n_i} + \frac{1}{n_{i&#39;}} \right)}}\]</span></p>
+<p>Under <span class="math inline">\(H_0\)</span> true</p>
+<p><span class="math display">\[q \sim f(q)_{t,n-t}\]</span></p>
+</div>
 </div>
 
 

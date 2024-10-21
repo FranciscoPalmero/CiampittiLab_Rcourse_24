@@ -1,0 +1,315 @@
+
+# Packages
+```{r}
+library(tidyverse)
+library(emmeans)
+library(car)
+library(lmerTest)
+```
+
+
+# 1) RCBD with One Factor: One-Way ANOVA
+
+## 1.1) Looking the data
+```{r}
+df <- read.csv("../Data/Nfer_Corn.csv")
+
+summary(df)
+glimpse(df)
+```
+
+
+### 1.1.1) Plotting the data
+```{r}
+df %>% 
+  ggplot(aes(Nrate_kg.ha,GY_kg.ha)) +
+  geom_point(aes(color=as.character(block))) +
+  scale_x_continuous(limits = c(0,380))+
+  scale_y_continuous(limits = c(0,16000)) +
+  geom_hline(yintercept = mean(df$GY_kg.ha))
+```
+
+
+## 1.2) Transforming the data for conducting an ANOVA
+```{r}
+df <- df %>% 
+  mutate(across(c(block,Nrate_kg.ha),as.factor))
+```
+
+
+## 1.3) Fitting the model
+
+$$y_{ij} = \mu + \tau_i + \epsilon_{ij}$$
+for $i = 1,2,...,6$ and $j=1,2,...,24$
+
+
+$y_{ij}$ is the response of the *jth* experimental unit given treatment the *ith* N rate
+
+$\mu$ is some fixed constant
+
+$\tau_i$ is the effect of the *ith* N rate as deviation from $\mu$
+
+$\epsilon_{ik}$ is the experimental error
+
+
+### 1.3.1) No restriction over the $\tau$
+
+```{r}
+m1 <- lm(GY_kg.ha~Nrate_kg.ha+block, data=df)
+summary(m1)
+```
+
+
+
+### 1.3.2) Restriction over the $\tau$
+
+$$\sum_{i=1}^t \tau_i = 0$$
+
+```{r}
+contrasts(df$Nrate_kg.ha) <- contr.sum(6)
+
+m2 <- lm(GY_kg.ha~Nrate_kg.ha+block, data=df)
+summary(m2)
+
+```
+
+
+
+## 1.4) Perfoming the ANOVA
+```{r}
+anova(m1)
+anova(m2)
+```
+
+
+## 1.5) Another way of conducting the ANOVA
+```{r}
+m2 <- aov(GY_kg.ha~Nrate_kg.ha+block, data=df)
+summary(m2)
+```
+
+
+## 1.6) Checking assumptions
+```{r}
+res <- residuals(m1)
+
+# Normality
+shapiro.test(res) # H0: residuals are normally distributed; do not reject H0 if p-value > 0.05
+
+qqnorm(res);qqline(res)
+
+# Homogeinity of variance
+plot(fitted(m1), res);abline(0,0)
+
+car::leveneTest(GY_kg.ha~Nrate_kg.ha, 
+           data = df)
+
+```
+
+
+
+## 1.7) Pairwise comparisons
+
+Obtain the estimated means
+```{r}
+m1_means <- emmeans(m1,~Nrate_kg.ha)
+m1_means
+```
+
+
+### 1.7.1) t-tests
+```{r}
+# p-values for the pairwise comparisons
+graphics::pairs(m1_means,
+                level = 0.95)
+
+# Confidence intervals for the pairwise comparions
+confint(graphics::pairs(m1_means,
+              adjust="none",
+              level = 0.95))
+
+# Obteining letters for showing differences
+multcomp::cld(m1_means,adjust = "none", 
+              Letters = letters,
+              level = 0.95,
+              decreasing = TRUE)
+```
+
+
+### 1.7.2) Tukey's HSD
+```{r}
+# p-values for the pairwise comparisons
+graphics::pairs(m1_means,
+                level = 0.95)
+
+# Confidence intervals for the pairwise comparions
+confint(graphics::pairs(m1_means,
+              adjust="tukey",
+              level = 0.95))
+
+# Obteining letters for showing differences
+multcomp::cld(m1_means,adjust = "sidak", 
+              Letters = letters,
+              level = 0.95,
+              decreasing = TRUE)
+```
+
+
+
+
+
+
+# 2) Split-Plot in a RCBD: ANOVA
+
+Plot -> Density
+Subplot -> Hybrid
+y -> seed weight $g~plant^{-1}$
+
+## 2.1) Looking the data
+```{r}
+df2 <- read.csv("../Data/Sorgh_Dens_Hyb.csv") %>% 
+  mutate(across(c(Block,Density,Hyb), as.factor))
+
+summary(df2)
+glimpse(df2)
+```
+
+
+## 2.2) Fitting the model
+
+
+$$y_{ijk} = \mu + \alpha_j + \rho_i + \delta_{ij} + \beta_k + (\alpha\beta)_{jk} + \epsilon_{ijk},$$
+
+$$\delta_{ij} \overset{\text{i.i.d.}}{\sim}  N(0,\sigma^2_w), $$
+
+
+$$\epsilon_{ibk} \overset{\text{i.i.d.}}{\sim}  N(0,\sigma^2_{\epsilon}).$$
+
+Furthermore $\delta_{ij}$ and $\epsilon_{ibk}$ are independent.
+
+$y_{ijk}$ is the response corresponding to the ith block, the j level of factor Density, the k level of factor Hybrid.
+
+$\mu$ is some fixed constant
+
+$\alpha_j$ is the effect of the j level of Density
+
+$\rho_i$ is the effect of the ith block
+
+$\delta_{ij}$ is the whole-plot random error
+
+$\beta_k$ is the effect of the k level of Hybrid
+
+$(\alpha\beta)_{jk}$ is the interaction effect of level j of Density and level k of Hybrid
+
+$\epsilon_{ijk}$ is the subplot random error
+
+
+
+
+### 2.2.1) Using base R
+```{r}
+m3 <- aov(Weight~Density+Error(Block)+Hyb+Density:Hyb,
+    data = df2)
+
+```
+
+### 2.2.2) Using lmer function from lmerTest package
+```{r}
+m4 <- lmerTest::lmer(Weight~Density*Hyb+(1|Density:Block),
+               data=df2)
+
+summary(m4)
+```
+
+
+## 2.3) Conducting ANOVA
+```{r}
+# Type I sum of squares
+summary(m3)
+# Type III sum of squares
+anova(m4)
+```
+
+
+## 2.4) Checking assumptions
+```{r}
+res <- residuals(m4)
+
+# Normality
+shapiro.test(res) # H0: residuals are normally distributed; do not reject H0 if p-value > 0.05
+
+qqnorm(res);qqline(res)
+
+# Homogeinity of variance
+plot(fitted(m4), res);abline(0,0)
+
+car::leveneTest(Weight~Density*Hyb, 
+           data = df2)
+
+```
+
+
+## 2.5) Pairwise comparisons
+
+There was no significant interaction, therefore, we can compare the main effects directly
+
+
+Obtain the estimated means for Density main effect
+```{r}
+m4_Dens_mean <- emmeans(m4,~Density)
+m4_Dens_mean
+```
+
+
+Obtain the estimated means for Hybrid main effect
+```{r}
+m4_Hyb_mean <- emmeans(m4,~Hyb)
+m4_Hyb_mean
+```
+
+
+
+### 2.5.1) Density Comparisons: Tukey's HSD
+```{r}
+# p-values for the pairwise comparisons
+graphics::pairs(m4_Dens_mean,
+                level = 0.95)
+
+# Confidence intervals for the pairwise comparisons
+confint(graphics::pairs(m4_Dens_mean,
+              adjust="tukey",
+              level = 0.95))
+
+# Obtaining letters for showing differences
+multcomp::cld(m4_Dens_mean,adjust = "sidak", 
+              Letters = letters,
+              level = 0.95,
+              decreasing = TRUE)
+```
+
+
+
+### 2.5.2) Hybrids Comparisons: Tukey's HSD
+```{r}
+# p-values for the pairwise comparisons
+graphics::pairs(m4_Hyb_mean,
+                level = 0.95)
+
+# Confidence intervals for the pairwise comparisons
+confint(graphics::pairs(m4_Hyb_mean,
+              adjust="tukey",
+              level = 0.95))
+
+# Obtaining letters for showing differences
+multcomp::cld(m4_Hyb_mean,adjust = "sidak", 
+              Letters = letters,
+              level = 0.95,
+              decreasing = TRUE)
+```
+
+
+
+
+
+
+
