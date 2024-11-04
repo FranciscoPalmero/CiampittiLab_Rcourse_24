@@ -1,0 +1,391 @@
+---
+title: ""
+output: html_document
+---
+
+<style>
+h1 {
+  font-size: 45px;
+  text-align: center;
+}
+h2 {
+  font-size: 40px;
+}
+h3 {
+  font-size: 35px;
+}
+h4 {
+  font-size: 30px;
+}
+</style>
+
+
+
+<style type="text/css">
+   body{
+   font-size: 18pt;
+ }
+</style>
+
+
+# Linear Random and Mixed Effects Models
+
+
+*Note:*
+
+A factor is a **random effect factor** if its levels consist of a random sample of levels from a population of possible levels.
+
+A factor is a **fixed effect factor** if its levels are selected by a nonrandom process or if its levels consist of the entire population of possible levels.
+
+
+$$\\[0.3cm]$$
+
+
+## 1) One-Way Random Effects Model (CRD)
+
+$$\\[0.01cm]$$
+
+
+**Random effects model** -> all of the factors in the treatment structure are random effects
+
+$$\\[0.01cm]$$
+
+The model:
+
+$$y_{ij} = \mu + \upsilon_i + \epsilon_{ij}, ~for ~ i = 1,...,t; ~j= 1,2,...,n_i.$$
+
+$$\upsilon_i \sim N(0,\sigma^2_{\upsilon}),$$
+
+$$\epsilon_{ij} \sim N(0,\sigma^2_{\epsilon}).$$
+
+$y_{ij}$ is the jth observation of the response variable in the ith random treatment.
+
+$\mu$ is the overall mean.
+
+$\upsilon_i$ effect of the ith randomly selected treatment.
+
+$\epsilon_{ij}$ random error of the jth observation in the ith treatment.
+
+
+$$\\[0.01cm]$$
+
+### 1.1) Variance Components
+
+The variance of an observation is
+
+$$var(y_{ij}) =  \sigma^2_{\upsilon} + \sigma^2_{\epsilon}$$
+
+$\sigma^2_{\upsilon}$ -> the variance of the population of treatments or levels of $\upsilon$
+
+$\sigma^2_{\epsilon}$ -> the variance of the experimental units
+
+
+(!) Look at the assumptions over $i$ and $j$.
+
+
+$$\\[0.01cm]$$
+
+### 1.2) Intraclass Correlation
+
+Covariance between two observations from the same $\upsilon_i$
+
+$Cov(y_{ij},y_{ij'}) = \sigma^2_\upsilon$ for $j \neq j'$.
+
+
+Covariance between two observations from different $\upsilon_i$
+
+$Cov(y_{ij},y_{i'j'}) = 0$ for $i \neq i'$.
+
+
+(!) What is this telling us?
+
+
+*Intraclass correlation*: measure of correlation between observations within the same random treatment.
+
+
+$$\rho = \frac{\sigma^2_\upsilon}{\sigma^2_\upsilon+\sigma^2_{\epsilon}}$$
+
+$$\\[0.01cm]$$
+
+**Other Alternatives to Write the Model**
+
+Look at the covariance matrix $\Sigma$.
+
+$$\\[0.3cm]$$
+
+## 2) Linear Mixed Models
+
+$$\\[0.01cm]$$
+
+**Mixed effects model** -> some of the factors in the treatment structure are *fixed effects* and some are *random effects*, or if all of the factors in the treatment structure are fixed effects and there is *more than one size of experimental unit* in the design structure (eg. Split-Plot Designs).
+
+$$\\[0.01cm]$$
+
+### 2.1) Ranom Blocks: One Factor in a RCBD
+
+The model:
+
+$$y_{ij} = \mu + \tau_i + \upsilon_j + \epsilon_{ij},$$
+
+$$\upsilon_i \sim N(0,\sigma^2_b),$$
+
+$$\epsilon_{ij} \sim N(0,\sigma^2_{\epsilon}).$$
+
+$y_{ij}$ is the jth observation of the response variable in the ith random treatment.
+
+$\mu$ is some fixed constant that is defined to depending on the purpose of the study.
+
+$\tau_i$ is the effect of the ith treatment as deviations from $\mu$.
+
+$\upsilon_i$ effect of the ith randomly selected treatment.
+
+$\epsilon_{ij}$ random error of the jth observation in the ith treatment.
+
+
+$$\\[0.01cm]$$
+
+
+$\sigma^2_b$ -> between blocks variability
+
+$\sigma^2_{\epsilon}$ -> within blocks variability
+
+
+$$\\[0.01cm]$$
+
+$Cov(y_{ij},y_{ij'}) = \sigma^2_b$ for $j \neq j'$.
+
+$Cov(y_{ij},y_{i'j'}) = 0$ for $i \neq i'$.
+
+
+$$\\[0.01cm]$$
+
+**Other Alternatives to Write the Model**
+
+Look at the covariance matrix $\Sigma$.
+
+
+$$\\[0.01cm]$$
+
+### 2.2) Random Intercept
+
+The model:
+
+$$y_{ij} = \beta_0 + \upsilon_i + \beta_1 x_j + \epsilon_{ij},$$
+
+$$\upsilon_i \sim N(0,\sigma^2_{\upsilon}),$$
+
+$$\epsilon_{ij} \sim N(0,\sigma^2_{\epsilon}).$$
+
+
+$y_{ij}$ is the jth observation of the response variable in the ith random treatment.
+
+$\beta_0$ intercept.
+
+$\upsilon_i$ effect of the ith randomly selected treatment over the intercept.
+
+$\beta_1$ slope.
+
+$x_j$ is the jth observation of the predictor variable.
+
+$\epsilon_{ij}$ random error of the jth observation in the ith treatment.
+
+
+$$\\[0.01cm]$$
+
+
+$\sigma^2_{\upsilon}$ -> between ... variability
+
+$\sigma^2_{\epsilon}$ -> within ... variability
+
+
+$$\\[0.01cm]$$
+
+$Cov(y_{ij},y_{ij'}) = \sigma^2_{\upsilon}$ for $j \neq j'$.
+
+$Cov(y_{ij},y_{i'j'}) = 0$ for $i \neq i'$.
+
+
+$$\\[0.01cm]$$
+
+**Other Alternatives to Write the Model**
+
+Look at the covariance matrix $\Sigma$.
+
+
+$$\\[0.3cm]$$
+
+### 2.2) Random Intercept and Slope
+
+The model:
+
+$$y_{ij} = \beta_0 + \upsilon_{i_1} + \beta_1 x_j + \upsilon_{i_2} x_j + \epsilon_{ij},$$
+
+$$\upsilon_{i_1} \sim N(0,\sigma^2_{\upsilon_1}),$$
+
+$$\upsilon_{i_2} \sim N(0,\sigma^2_{\upsilon_2}),$$
+
+$$\epsilon_{ij} \sim N(0,\sigma^2_{\epsilon}).$$
+
+
+$y_{ij}$ is the jth observation of the response variable in the ith random treatment.
+
+$\beta_0$ intercept.
+
+$\upsilon_{i_1}$ effect of the ith randomly selected treatment over the intercept.
+
+$\beta_1$ slope.
+
+$x_j$ is the jth observation of the predictor variable.
+
+$\upsilon_{i_2}$ effect of the ith randomly selected treatment over the slope.
+
+$\epsilon_{ij}$ random error of the jth observation in the ith treatment.
+
+
+$$\\[0.01cm]$$
+
+
+$\sigma^2_{\upsilon_1}$ -> between ... variability
+
+$\sigma^2_{\upsilon_2}$ -> between ... variability
+
+$\sigma^2_{\epsilon}$ -> within ... variability
+
+
+$$\\[0.01cm]$$
+
+$Cov(y_{ij},y_{ij'}) = \sigma^2_{\upsilon_1}$ for $j \neq j'$ -> affecting the intercept.
+
+$Cov(y_{ij},y_{ij'}) = \sigma^2_{\upsilon_2}$ for $j \neq j'$ -> affecting the slope.
+
+$Cov(y_{ij},y_{i'j'}) = 0$ for $i \neq i'$.
+
+
+$$\\[0.01cm]$$
+
+**Other Alternatives to Write the Model**
+
+Look at the covariance matrix $\Sigma$.
+
+
+
+
+$$\\[0.3cm]$$
+
+
+## 3) The main objectives in statistics:
+
+- **Estimation** (point and uncertainty)
+
+- **Inference** (hypothesis testing)
+
+- **Prediction**
+
+
+$$\\[0.01cm]$$
+
+### 3.1) Estimation
+
+#### 3.1.1) Variance Components
+
+There are different methods for estimating the variance components in a random or mixed effects model:
+
+i) MOM
+
+ii) MIVQUE
+
+iii) ML
+
+iv) REML
+
+**REML**:
+
+- Best properties for balanced and unbalanced designs
+
+- Unbiased estimation
+
+- Usually finding closed-form estimating equations is not possible
+
+- Numerical methods are used to solve the equations for estimating variance components, e.g. Penalized Least Squares, Newton-Raphson, Fisher Scoring.
+
+
+$$\\[0.01cm]$$
+
+#### 3.1.2) Fixed Effects
+
+We take the estimation of the variance components, $\hat\Sigma$, to estimate the coefficients of the fixed effects.
+
+**Maximum Likelihood** -> under normality it yields the same estimators than *Generalized Least Squares*.
+
+$$\\[0.01cm]$$
+
+(!) Look at the estimator.
+
+
+$$\\[0.01cm]$$
+
+
+(!) Do the random effects influence the estimation of the fixed effects?
+
+
+$$\\[0.01cm]$$
+
+
+### 3.2) Inference
+
+$\hat\beta$ -> asymptotically unbiased and normally distributed
+
+**Large-Sample Inference for Estimable Functions of $\beta$**
+
+Relies on $\chi^2$ distributions.
+
+**Small-Sample Inference for Estimable Functions of $\beta$**
+
+$t$ tests using the *Delta Method* for estimating the variance of $c' \beta$ and *Satterthwaite* approximation for the degrees of freedom.
+
+$F$ distribution with *known* df for the numerator, but *unknown* df for the denominator (*Kenward-Roger* approximation).
+
+
+$$\\[0.3cm]$$
+
+
+## 4) Summary Linear Mixed Models
+
+- Linear mixed model is a model with fixed and random effects, that is a model in which some parameters (random) are given a probability model. 
+
+- We use linear mixed models:
+
+    -> when we are interested not only in an overall effect of $x$ over $y$, but also how this effect varies in the population or by groups.
+    
+    -> to perform inferences for groups with small sample size using all the data
+    
+    -> more efficient inference for regression parameters: no pooling ignores information and can give unacceptably variable inferences, and complete pooling suppresses variation that can be important or even the main goal of a study.
+    
+    -> getting the right standard error: accurately accounting for uncertainty in prediction and estimation. E.g. accounting for spatial correlation between observations (higher complexity in the covariance structure), repeated measures.
+    
+
+
+$$\\[0.3cm]$$
+
+## 5) Take Home Messages
+
+- Be sure to know your experimental design and your objective.
+
+- Clearly define your research question.
+
+- Define the statistical model
+
+   -> Be sure to know how to write your statistical model
+   
+   -> Be sure what your statistical model is estimating
+   
+   -> Do not worry too much about how the estimation and inference is made in your R package, but be sure that R is fitting the model you want
+
+- Estimation and inference in mixed models is not as easy as in linear regression models, but you can still make estimation and inference (be sure to understand the **essence** of both processes, not the whole derivation of the process).
+
+
+$$\\[0.01cm]$$
+
+
+
+
